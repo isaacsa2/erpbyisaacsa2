@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nota Fiscal - {{ nfe_data.nfe_id }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .nfe-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 2px solid #000;
+            background-color: white;
+        }
+        .nfe-header {
+            text-align: center;
+            border-bottom: 2px solid #000;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+        }
+        .nfe-footer {
+            margin-top: 30px;
+            border-top: 1px solid #000;
+            padding-top: 10px;
+            text-align: center;
+        }
+        .item-row {
+            border-bottom: 1px solid #ddd;
+            padding: 5px 0;
+        }
+        @media print {
+            .no-print {
+                display: none;
+            }
+            body {
+                background-color: white;
+            }
+            .nfe-container {
+                border: none;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container my-4">
+        <div class="nfe-container">
+            <!-- Cabeçalho -->
+            <div class="nfe-header">
+                <h1>NOTA FISCAL ELETRÔNICA</h1>
+                <h3>{{ nfe_data.nfe_id }}</h3>
+                <p>Data e Hora: {{ nfe_data.date }}</p>
+                <p>Status: 
+                    <span class="badge 
+                        {% if nfe_data.status == 'Pago' %}bg-success
+                        {% elif nfe_data.status == 'Pendente' %}bg-warning
+                        {% elif nfe_data.status == 'Cancelado' %}bg-danger
+                        {% else %}bg-secondary{% endif %}">
+                        {{ nfe_data.status }}
+                    </span>
+                </p>
+            </div>
+
+            <!-- Dados do Cliente -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h4>Dados do Cliente</h4>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>Nome:</th>
+                            <td>{{ nfe_data.customer.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>E-mail:</th>
+                            <td>{{ nfe_data.customer.email }}</td>
+                        </tr>
+                        <tr>
+                            <th>Telefone:</th>
+                            <td>{{ nfe_data.customer.phone }}</td>
+                        </tr>
+                        <tr>
+                            <th>Endereço:</th>
+                            <td>{{ nfe_data.customer.address }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Itens da Venda -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h4>Itens da Venda</h4>
+                    <table class="table table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Produto</th>
+                                <th>Quantidade</th>
+                                <th>Preço Unit.</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in nfe_data.sale_items %}  <!-- Alterado para sale_items -->
+                            <tr>
+                                <td>{{ item.name }}</td>
+                                <td>{{ item.qty }}</td>
+                                <td>R$ {{ item.unit_price }}</td>
+                                <td>R$ {{ item.subtotal }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="table-primary">
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                <td><strong>R$ {{ nfe_data.total }}</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Rodapé -->
+            <div class="nfe-footer">
+                <p>&copy; 2025 ERP by Isaac</p>
+                <p>Data de emissão: {{ now.strftime('%d/%m/%Y %H:%M') }}</p>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="row mt-4 no-print">
+                <div class="col-12 text-center">
+                    <button onclick="window.print()" class="btn btn-primary me-2">
+                        📄 Imprimir NFe
+                    </button>
+                    <a href="{{ url_for('erp.sales') }}" class="btn btn-secondary me-2">
+                        ← Voltar para Vendas
+                    </a>
+                    <a href="{{ url_for('erp.pdv') }}" class="btn btn-success">
+                        ➕ Nova Venda
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-print ao carregar a página (opcional)
+        window.onload = function() {
+            // Descomente a linha abaixo se quiser que imprima automaticamente
+            // window.print();
+        };
+    </script>
+</body>
+</html>

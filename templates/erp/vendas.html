@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block title %}Vendas{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Registrar Venda</h2>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="POST" id="sale-form">
+<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <select name="customer" class="form-select" required>
+                        <option value="">Selecione o Cliente</option>
+                        {% for c in customers %}
+                        <option value="{{ c.id }}">{{ c.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <input type="number" name="due_days" class="form-control" placeholder="Dias para vencimento AR" value="7">
+                </div>
+                <div class="col-md-4 d-flex align-items-center">
+                    <input type="checkbox" name="create_ar" class="form-check-input me-2" id="create_ar">
+                    <label for="create_ar" class="form-check-label">Gerar Conta a Receber</label>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <select id="product-select" class="form-select">
+                        <option value="">Selecione o Produto</option>
+                        {% for product in products %}
+                        <option value="{{ product.id }}" data-price="{{ product.price }}" data-stock="{{ product.stock }}" data-name="{{ product.name }}">
+                            {{ product.name }} (R$ {{ product.price|fmt }}) - Estoque: {{ product.stock }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <input type="number" id="product-qty" min="1" value="1" class="form-control" placeholder="Quantidade">
+                </div>
+                <div class="col-md-3">
+                    <button type="button" id="add-product-btn" class="btn btn-primary w-100">Adicionar ao Carrinho</button>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <table class="table table-bordered" id="cart-table">
+                    <thead class="bg-gradient-sales text-white">
+                        <tr>
+                            <th>Produto</th>
+                            <th>Quantidade</th>
+                            <th>Preço Unit.</th>
+                            <th>Subtotal</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Linhas do carrinho adicionadas via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center">
+                <button type="submit" class="btn btn-success px-4 py-2">Registrar Venda</button>
+                <h5>Total: <span id="total-sale">R$ 0,00</span></h5>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Últimas 10 vendas -->
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="bg-gradient-sales text-white">
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Data</th>
+                        <th>Status</th>
+                        <th>Total</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in sales[:10] %}
+                    <tr class="align-middle">
+                        <td>{{ s.customer.name }}</td>
+                        <td>{{ s.date.strftime('%d/%m/%Y') }}</td>
+                        <td>
+                            {% if s.status == "Pago" %}
+                                <span class="badge bg-success">{{ s.status }}</span>
+                            {% elif s.status == "Cancelado" %}
+                                <span class="badge bg-danger">{{ s.status }}</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">{{ s.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>R$ {{ s.total|fmt }}</td>
+                        <td>
+                            {% if s.status == 'Pendente' %}
+                                <form method="POST" action="{{ url_for('erp.cancel_sale', sale_id=s.id) }}" class="d-inline"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><button type="submit" class="btn btn-sm btn-danger">Cancelar</button></form>
+                            {% elif s.status == 'Cancelado' %}
+                                <form method="POST" action="{{ url_for('erp.undo_cancel_sale', sale_id=s.id) }}" class="d-inline"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><button type="submit" class="btn btn-sm btn-success">Refazer</button></form>
+                            {% else %}
+                                <a href="#" class="btn btn-sm btn-secondary disabled">N/A</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+const productSelect = document.getElementById('product-select');
+const productQty = document.getElementById('product-qty');
+const addBtn = document.getElementById('add-product-btn');
+const cartTable = document.querySelector('#cart-table tbody');
+const totalEl = document.getElementById('total-sale');
+
+let cart = [];
+
+function formatBRL(value) {
+    return 'R$ ' + value.toFixed(2).replace('.', ',');
+}
+
+function updateCartTable() {
+    cartTable.innerHTML = '';
+    let total = 0;
+
+    cart.forEach((item, index) => {
+        const subtotal = item.price * item.qty;
+        total += subtotal;
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${item.name}<input type="hidden" name="product_${item.id}" value="${item.qty}"></td>
+            <td>${item.qty}</td>
+            <td>R$ ${item.price}</td>
+            <td>R$ ${subtotal.toFixed(2).replace('.',',')}</td>
+            <td><button type="button" class="btn btn-sm btn-danger" onclick="removeItem(${index})">X</button></td>
+        `;
+        cartTable.appendChild(row);
+    });
+
+    totalEl.textContent = formatBRL(total);
+}
+
+function removeItem(index) {
+    cart.splice(index, 1);
+    updateCartTable();
+}
+
+addBtn.addEventListener('click', () => {
+    const selected = productSelect.selectedOptions[0];
+    const qty = parseInt(productQty.value) || 1;
+
+    if (!selected.value) return alert('Selecione um produto!');
+    const id = selected.value;
+    const name = selected.dataset.name;
+    const price = parseFloat(selected.dataset.price);
+    const stock = parseInt(selected.dataset.stock);
+
+    if (qty > stock) return alert('Quantidade maior que o estoque!');
+
+    const existing = cart.find(i => i.id === id);
+    if (existing) {
+        if (existing.qty + qty > stock) return alert('Quantidade maior que o estoque!');
+        existing.qty += qty;
+    } else {
+        cart.push({id, name, price, qty});
+    }
+
+    updateCartTable();
+});
+</script>
+{% endblock %}

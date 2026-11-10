@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+{% block title %}Dashboard -  ERP by Isaac{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Painel de Controle — ERP by Isaac</h2>
+    </div>
+
+    <!-- Filtros de período -->
+    <div class="d-flex justify-content-end mb-3">
+        <form method="get" class="d-flex align-items-center">
+            <label class="me-2">Período:</label>
+            <select name="days" class="form-select select-enhanced me-2" onchange="this.form.submit()">
+                {% for option in [1,7,14,30,60,120] %}
+                    <option value="{{ option }}" {% if data.days == option %}selected{% endif %}>
+                        {% if option == 1 %}Últimas 24h{% else %}Últimos {{ option }} dias{% endif %}
+                    </option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-pdv">Atualizar</button>
+        </form>
+    </div>
+
+    <!-- Primeira linha com 4 cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card bg-gradient-sales text-white text-center p-3 shadow-sm card-hover">
+                <h6>Receita Total de Vendas</h6>
+                <h4>R$ {{ data.total_sales|fmt }}</h4>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card bg-gradient-paid text-white text-center p-3 shadow-sm card-hover">
+                <h6>Vendas Recebidas</h6>
+                <h4>R$ {{ data.total_paid_sales|fmt }}</h4>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card bg-gradient-ar text-white text-center p-3 shadow-sm card-hover">
+                <h6>Contas a Receber</h6>
+                <h4>R$ {{ data.total_ar_pending|fmt }}</h4>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card bg-gradient-ap text-white text-center p-3 shadow-sm card-hover">
+                <h6>Contas a Pagar</h6>
+                <h4>R$ {{ data.total_ap_pending|fmt }}</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- Segunda linha com 3 cards - inadimplência no meio -->
+    <div class="row g-4 mb-4">
+        <div class="col-12 col-md-4">
+            <div class="card bg-gradient-fixedcosts text-white text-center p-3 shadow-sm card-hover">
+                <h6>Custos Fixos</h6>
+                <h4>R$ {{ data.total_fixed_costs|fmt }}</h4>
+            </div>
+        </div>
+        
+        <div class="col-12 col-md-4">
+            <div class="card bg-warning text-white p-3 shadow-sm card-hover">
+                <h6 class="text-center">Inadimplência</h6>
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h4>{{ data.defaulters_count }}</h4>
+                        <small>Clientes inadimplentes</small>
+                    </div>
+                    <div class="col-6">
+                        <h4>R$ {{ data.total_debt|fmt }}</h4>
+                        <small>Total devido</small>
+                    </div>
+                </div>
+                <!-- <a href="{{ url_for('erp.defaulters_report') }}" class="btn btn-light btn-sm mt-2 w-100">Ver detalhes</a> -->
+            </div>
+        </div>
+        
+        <div class="col-12 col-md-4">
+            <div class="card bg-gradient-treasury text-white text-center p-3 shadow-sm card-hover">
+                <h6>Saldo do Caixa</h6>
+                <h4>R$ {{ data.treasury_balance|fmt }}</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="row g-4 mb-4">
+        <div class="col-12 col-lg-6">
+            <div class="card p-3 shadow-sm card-hover">
+                <h6>Evolução do Caixa (últimos {{ data.days }} dias)</h6>
+                <canvas id="cashFlowChart" height="200"></canvas>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="card p-3 shadow-sm card-hover">
+                <h6>Top Produtos Vendidos</h6>
+                <canvas id="topProductsChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Curva ABC -->
+    <div class="card mb-4 shadow-sm card-hover">
+        <div class="card-header">
+            <h6>Curva ABC de Produtos</h6>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th>Vendas (R$)</th>
+                            <th>Categoria ABC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in data.abc_products %}
+                        <tr>
+                            <td>{{ item.product }}</td>
+                            <td>R$ {{ item.total_sales|fmt }}</td>
+                            <td>
+                                {% if item.category == 'A' %}
+                                    <span class="badge bg-gradient-sales">{{ item.category }}</span>
+                                {% elif item.category == 'B' %}
+                                    <span class="badge bg-gradient-paid">{{ item.category }}</span>
+                                {% else %}
+                                    <span class="badge bg-gradient-lowstock text-dark">{{ item.category }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Últimas vendas -->
+    <div class="card mb-4 shadow-sm card-hover">
+        <div class="card-header">
+            <h6>Últimas Vendas</h6>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Data</th>
+                            <th>Status</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sale in data.last_sales %}
+                        <tr>
+                            <td>{{ sale.customer.name }}</td>
+                            <td>{{ sale.date|datetime_fmt("%d/%m/%Y") }}</td>
+                            <td>
+                                {% if sale.status == "Pago" %}
+                                    <span class="badge bg-gradient-paid">{{ sale.status }}</span>
+                                {% elif sale.status == "Cancelado" %}
+                                    <span class="badge bg-gradient-ap">{{ sale.status }}</span>
+                                {% else %}
+                                    <span class="badge bg-gradient-lowstock text-dark">{{ sale.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>R$ {{ sale.total|fmt }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const cashFlowCtx = document.getElementById('cashFlowChart').getContext('2d');
+new Chart(cashFlowCtx, {
+    type: 'line',
+    data: {
+        labels: {{ data.cash_flow.labels | tojson }},
+        datasets: [
+            {
+                label: 'Entradas',
+                data: {{ data.cash_flow.inflows | tojson }},
+                borderColor: 'rgba(67, 97, 238, 1)',
+                backgroundColor: 'rgba(67, 97, 238, 0.2)',
+                fill: true,
+                tension: 0.3
+            },
+            {
+                label: 'Saídas',
+                data: {{ data.cash_flow.outflows | tojson }},
+                borderColor: 'rgba(239, 71, 111, 1)',
+                backgroundColor: 'rgba(239, 71, 111, 0.2)',
+                fill: true,
+                tension: 0.3
+            }
+        ]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'top' } } }
+});
+
+const topProductsCtx = document.getElementById('topProductsChart').getContext('2d');
+new Chart(topProductsCtx, {
+    type: 'bar',
+    data: {
+        labels: {{ data.top_products | map(attribute='name') | list | tojson }},
+        datasets: [{
+            label: 'Qtd Vendida',
+            data: {{ data.top_products | map(attribute='sold_qty') | list | tojson }},
+            backgroundColor: 'rgba(114, 9, 183, 0.7)',
+            borderColor: 'rgba(114, 9, 183, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+});
+</script>
+{% endblock %}

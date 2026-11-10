@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Contas a Pagar{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Contas a Pagar</h2>
+
+<!-- Formulário em card -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="POST" class="row g-3">
+<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <div class="col-md-3">
+                <select name="supplier" class="form-select" required>
+                    <option value="">Selecione o Fornecedor</option>
+                    {% for s in suppliers %}
+                        <option value="{{ s.id }}">{{ s.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="due_date" class="form-control" required>
+            </div>
+            <div class="col-md-2">
+                <input type="number" name="amount" class="form-control" placeholder="Valor" step="0.01" required>
+            </div>
+            <div class="col-md-4">
+                <input type="text" name="description" class="form-control" placeholder="Descrição">
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">OK</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tabela de Contas a Pagar -->
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="bg-gradient-ap text-white">
+                    <tr>
+                        <th>Vencimento</th>
+                        <th>Fornecedor</th>
+                        <th>Valor</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ap in payables %}
+                    <tr>
+                        <td>{{ ap.due_date.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ ap.supplier.name }}</td>
+                        <td>R$ {{ ap.amount|fmt }}</td>
+                        <td>{{ ap.status }}</td>
+                        <td>
+                            {% if ap.status != 'Pago' %}
+                            <form method="POST" action="{{ url_for('erp.payables_pay', ap_id=ap.id) }}">
+<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                                <input type="date" name="payment_date" value="{{ now.strftime('%Y-%m-%d') }}" class="form-control mb-1">
+                                <select name="payment_method" class="form-select mb-1" required>
+                                    <option value="">Escolha o método</option>
+                                    <option value="Pix">Pix</option>
+                                    <option value="Boleto">Boleto</option>
+                                    <option value="Cartão">Cartão</option>
+                                    <option value="Dinheiro">Dinheiro</option>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-success">Marcar Pago</button>
+                            </form>
+                            {% else %}
+                                Pago em {{ ap.payment_date.strftime('%d/%m/%Y') }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
