@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Contas a Receber{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Contas a Receber</h2>
+
+<!-- Formulário em card -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="POST" class="row g-3">
+<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <div class="col-md-3">
+                <select name="customer" class="form-select" required>
+                    <option value="">Selecione o Cliente</option>
+                    {% for c in customers %}
+                        <option value="{{ c.id }}">{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="date" name="due_date" class="form-control" required>
+            </div>
+            <div class="col-md-2">
+                <input type="number" name="amount" class="form-control" placeholder="Valor" step="0.01" required>
+            </div>
+            <div class="col-md-3">
+                <input type="text" name="notes" class="form-control" placeholder="Observações">
+            </div>
+            <div class="col-md-2">
+                <input type="number" name="sale_id" class="form-control" placeholder="ID Venda (opcional)">
+            </div>
+            <div class="col-md-12 mt-2 d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary px-4 py-2">Adicionar AR</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tabela de Contas a Receber -->
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="bg-gradient-ar text-white">
+                    <tr>
+                        <th>Vencimento</th>
+                        <th>Cliente</th>
+                        <th>Valor</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ar in receivables %}
+                    <tr>
+                        <td>{{ ar.due_date|date_fmt  }}</td>
+                        <td>{{ ar.customer.name }}</td>
+                        <td>R$ {{ ar.amount|fmt }}</td>
+                        <td>{{ ar.status }}</td>
+                        <td>
+                            {% if ar.status != 'Pago' %}
+                            <form method="POST" action="{{ url_for('erp.receivables_pay', ar_id=ar.id) }}">
+<input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                                <input type="date" name="payment_date" value="{{ now.strftime('%Y-%m-%d') }}" class="form-control mb-1">
+                                <select name="payment_method" class="form-select mb-1" required>
+                                    <option value="">Escolha o método</option>
+                                    <option value="Pix">Pix</option>
+                                    <option value="Boleto">Boleto</option>
+                                    <option value="Cartão">Cartão</option>
+                                    <option value="Dinheiro">Dinheiro</option>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-success">Marcar Pago</button>
+                            </form>
+                            {% else %}
+                                Pago em {{ ar.payment_date|date_fmt }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

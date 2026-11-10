@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Página não encontrada{% endblock %}
+{% block content %}
+<canvas id="matrixCanvas"></canvas>
+<div class="text-center py-5" style="position: relative; z-index: 1;">
+    <div class="card bg-dark text-success p-5 mx-auto" style="max-width: 500px; border-radius: 1rem; border: 2px solid #00ff00;">
+        <h1 class="display-1">404</h1>
+        <h2>Página não encontrada</h2>
+        <p>A página que você tentou acessar não existe.</p>
+        <a href="{{ url_for('erp.dashboard') }}" class="btn btn-success mt-3">Voltar ao Dashboard</a>
+    </div>
+</div>
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100%;
+    background: black;
+}
+
+#matrixCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.matrix-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #00ff00;
+    font-family: 'Courier New', monospace;
+}
+
+.matrix-overlay h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.matrix-overlay p {
+    font-size: 1.5rem;
+}
+</style>
+<script>
+const canvas = document.getElementById('matrixCanvas');
+const ctx = canvas.getContext('2d');
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+const fontSize = 20;
+const columns = Math.floor(canvas.width / fontSize);
+const drops = Array(columns).fill(0);
+
+function draw() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "#00ff00";
+    ctx.font = fontSize + "px monospace";
+
+    for(let i = 0; i < drops.length; i++) {
+        const text = letters.charAt(Math.floor(Math.random() * letters.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+            drops[i] = 0;
+        }
+
+        drops[i]++;
+    }
+}
+
+setInterval(draw, 60);
+
+window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
+</script>
+{% endblock %}

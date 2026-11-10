@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}ERP ERP by Isaac{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='erp_style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+<div class="container mt-4">
+
+    {% if current_user.is_authenticated %}
+        <ul class="nav-sector">
+            <!-- Início -->
+            <li class="nav-item sector-reports">
+                <a class="nav-link {% if request.endpoint == 'erp.dashboard' %}active{% endif %}" 
+                   href="{{ url_for('erp.dashboard') }}" data-bs-toggle="tooltip" title="Página inicial">
+                    <i class="bi bi-house-door-fill"></i> <span class="nav-text">Início</span>
+                </a>
+            </li>
+            <li class="sector-divider d-none d-md-block"></li>
+
+            <!-- Vendas -->
+            <li class="nav-item sector-sales">
+                <a class="nav-link {% if request.endpoint == 'erp.pdv' %}active{% endif %}" 
+                   href="{{ url_for('erp.pdv') }}" data-bs-toggle="tooltip" title="Ponto de Venda">
+                    <i class="bi bi-cash-coin"></i> <span class="nav-text">PDV</span>
+                </a>
+            </li>
+            <li class="nav-item sector-sales">
+                <a class="nav-link {% if request.endpoint == 'erp.customers' %}active{% endif %}" 
+                   href="{{ url_for('erp.customers') }}" data-bs-toggle="tooltip" title="Gerenciar clientes">
+                    <i class="bi bi-people-fill"></i> <span class="nav-text">Clientes</span>
+                </a>
+            </li>
+            <li class="nav-item sector-sales">
+                <a class="nav-link {% if request.endpoint == 'erp.sales' %}active{% endif %}" 
+                   href="{{ url_for('erp.sales') }}" data-bs-toggle="tooltip" title="Gerenciar vendas">
+                    <i class="bi bi-cart-fill"></i> <span class="nav-text">Vendas</span>
+                </a>
+            </li>
+
+            <li class="sector-divider d-none d-md-block"></li>
+
+            <!-- Produtos -->
+            <li class="nav-item sector-products">
+                <a class="nav-link {% if request.endpoint == 'erp.products' %}active{% endif %}" 
+                   href="{{ url_for('erp.products') }}" data-bs-toggle="tooltip" title="Gerenciar produtos">
+                    <i class="bi bi-box-seam"></i> <span class="nav-text">Produtos</span>
+                </a>
+            </li>
+            <li class="nav-item sector-products">
+                <a class="nav-link {% if request.endpoint == 'erp.suppliers' %}active{% endif %}" 
+                   href="{{ url_for('erp.suppliers') }}" data-bs-toggle="tooltip" title="Gerenciar fornecedores">
+                    <i class="bi bi-truck"></i> <span class="nav-text">Fornecedores</span>
+                </a>
+            </li>
+
+            <li class="sector-divider d-none d-md-block"></li>
+
+            <!-- Financeiro -->
+            <li class="nav-item sector-finance">
+                <a class="nav-link {% if request.endpoint == 'erp.receivables' %}active{% endif %}" 
+                   href="{{ url_for('erp.receivables') }}" data-bs-toggle="tooltip" title="Recebimentos">
+                    <i class="bi bi-cash-stack"></i> <span class="nav-text">Recebimentos</span>
+                </a>
+            </li>
+            <li class="nav-item sector-finance">
+                <a class="nav-link {% if request.endpoint == 'erp.payables' %}active{% endif %}" 
+                   href="{{ url_for('erp.payables') }}" data-bs-toggle="tooltip" title="Pagamentos">
+                    <i class="bi bi-credit-card-fill"></i> <span class="nav-text">Pagamentos</span>
+                </a>
+            </li>
+            <li class="nav-item sector-finance">
+                <a class="nav-link {% if request.endpoint == 'erp.treasury' %}active{% endif %}" 
+                   href="{{ url_for('erp.treasury') }}" data-bs-toggle="tooltip" title="Tesouraria">
+                    <i class="bi bi-bank2"></i> <span class="nav-text">Tesouraria</span>
+                </a>
+            </li>
+            <li class="nav-item sector-fixedcosts">
+                <a class="nav-link {% if request.endpoint == 'erp.fixed_costs' %}active{% endif %}" 
+                   href="{{ url_for('erp.fixed_costs') }}" data-bs-toggle="tooltip" title="Custos Fixos">
+                    <i class="bi bi-receipt"></i> <span class="nav-text">Custos Fixos</span>
+                </a>
+            </li>
+
+            <li class="sector-divider d-none d-md-block"></li>
+
+            <li class="nav-item sector-products">
+                <a class="nav-link {% if request.endpoint == 'erp.aulas' %}active{% endif %}"
+                   href="{{ url_for('erp.aulas') }}" title="Aulas práticas de Banco de Dados">
+                    <i class="bi bi-mortarboard-fill"></i> <span class="nav-text">Laboratório SQL</span>
+                </a>
+            </li>
+            <!-- Logout -->
+            <li class="nav-item ms-auto">
+                <form method="POST" action="{{ url_for('erp.logout') }}"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><button type="submit" class="nav-link text-danger logout-btn" data-bs-toggle="tooltip" title="Sair do sistema">
+                    <i class="bi bi-box-arrow-right"></i> <span class="nav-text">Logout</span>
+                </button></form>
+            </li>
+        </ul>
+    {% endif %}
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show mt-3" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Conteúdo -->
+    <div class="mt-3">
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="footer bg text-center py-3 mt-4">
+        <p>&copy; 2025 ERP by Isaac - Todos os direitos reservados</p>
+    </footer>
+</div>
+
+<!-- Botão tema -->
+<button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+
+<script>
+    // Tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+
+    // Tema claro/escuro
+    function toggleTheme() {
+        document.body.classList.toggle("light-mode");
+        localStorage.setItem("theme", document.body.classList.contains("light-mode") ? "light" : "dark");
+    }
+
+    window.onload = () => {
+        // Verificar preferência salva
+        if(localStorage.getItem("theme") === "light") {
+            document.body.classList.add("light-mode");
+        } else if (localStorage.getItem("theme") === "dark") {
+            document.body.classList.add("dark-mode");
+        }
+        
+        // Verificar prefers-color-scheme do sistema se não houver preferência salva
+        if(!localStorage.getItem("theme") && window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+            document.body.classList.add("light-mode");
+        }
+    }
+
+    // Konami code -> redirect
+    let keys = [];
+    const secretCode = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+    document.addEventListener('keydown', (e) => {
+        keys.push(e.key);
+        keys.splice(-secretCode.length - 1, keys.length - secretCode.length);
+        if (keys.join('').includes(secretCode.join(''))) {
+            window.location.href = '/error404';
+        }
+    });
+</script>
+</body>
+</html>

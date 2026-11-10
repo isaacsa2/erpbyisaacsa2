@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Clientes Inadimplentes</h2>
+
+<div class="alert alert-warning">
+    <strong>Total em débito:</strong> R$ {{ total_debt }}
+</div>
+
+<!-- Filtro e busca -->
+<form method="get" class="mb-3">
+    <div class="input-group">
+        <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Buscar cliente...">
+        <button type="submit" class="btn btn-primary">Buscar</button>
+    </div>
+</form>
+
+<!-- Tabela de inadimplentes -->
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Inadimplente desde</th>
+                <th>Motivo</th>
+                <th>Débito pendente</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for customer in customers %}
+            <tr>
+                <td>{{ customer.name }}</td>
+                <td>{{ customer.defaulter_since.strftime('%d/%m/%Y') if customer.defaulter_since else 'N/A' }}</td>
+                <td>{{ customer.default_reason or 'N/A' }}</td>
+                <td>
+                    {% set customer_debt = namespace(total=0) %}
+                    {% for ar in customer.receivables if ar.status in ['Atrasado', 'Pendente'] %}
+                        {% set customer_debt.total = customer_debt.total + ar.amount %}
+                    {% endfor %}
+                    R$ {{ fmt(customer_debt.total) }}
+                </td>
+                <td>
+                    <form method="POST" action="{{ url_for('erp.regularize_customer', customer_id=customer.id) }}" class="d-inline"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Regularizar este cliente?')">Regularizar</button></form>
+                    <a href="{{ url_for('erp.receivables') }}?customer_id={{ customer.id }}" 
+                       class="btn btn-info btn-sm">
+                        Ver débitos
+                    </a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" class="text-center">Nenhum cliente inadimplente encontrado</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Paginação -->
+{% if pagination.pages > 1 %}
+<nav>
+    <ul class="pagination">
+        {% if pagination.has_prev %}
+        <li class="page-item">
+            <a class="page-link" href="{{ url_for('erp.defaulters_report', page=pagination.prev_num, q=q) }}">Anterior</a>
+        </li>
+        {% endif %}
+        
+        {% for page_num in pagination.iter_pages() %}
+        <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+            <a class="page-link" href="{{ url_for('erp.defaulters_report', page=page_num, q=q) }}">{{ page_num }}</a>
+        </li>
+        {% endfor %}
+        
+        {% if pagination.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="{{ url_for('erp.defaulters_report', page=pagination.next_num, q=q) }}">Próxima</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

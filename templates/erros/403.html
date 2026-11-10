@@ -1,0 +1,3 @@
+{% extends "base.html" %}
+{% block title %}403 – Acesso negado{% endblock %}
+{% block content %}<div class="alert alert-warning mt-5"><h1>403 – Acesso negado</h1><p>Sua conta não pode executar esta ação.</p><a class="btn btn-primary" href="{{ url_for('erp.dashboard') }}">Voltar</a></div>{% endblock %}
