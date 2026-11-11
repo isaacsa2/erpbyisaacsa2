@@ -1,3 +1,5 @@
+{# GUIA: Contas a receber, vencimentos e baixa de recebimento. #}
+{# As variáveis exibidas na tela chegam do Python pela função render_template. #}
 {% extends "base.html" %}
 {% block title %}Contas a Receber{% endblock %}
 
@@ -7,12 +9,14 @@
 <!-- Formulário em card -->
 <div class="card mb-4">
     <div class="card-body">
-        <form method="POST" class="row g-3">
+        {# POST envia dados para validação no servidor. #}
+<form method="POST" class="row g-3">
 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <div class="col-md-3">
                 <select name="customer" class="form-select" required>
                     <option value="">Selecione o Cliente</option>
-                    {% for c in customers %}
+                    {# Este laço cria uma linha para cada registro recebido do banco. #}
+{% for c in customers %}
                         <option value="{{ c.id }}">{{ c.name }}</option>
                     {% endfor %}
                 </select>
