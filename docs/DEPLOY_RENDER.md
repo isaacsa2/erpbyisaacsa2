@@ -1,29 +1,35 @@
-# Publicando o ERP na Render — modo demonstração
+# Publicação na Render: ERP público administrável (somente dados fictícios)
 
-A URL real só será conhecida **depois** que você criar o serviço na sua conta Render.
+Serviço existente: **erpbyisaacsa2**.
+Site: https://erpbyisaacsa2.onrender.com
+Painel: https://dashboard.render.com/web/srv-dbq4nvbl550s739ikua0
 
-1. Acesse [Render Dashboard](https://dashboard.render.com/) e conecte seu GitHub.
-2. Escolha **New → Blueprint**, selecione `isaacsa2/erpbyisaacsa2` e a branch `main`.
-3. Confirme a configuração de `render.yaml`: serviço web Python, plano Free, nome `erp-by-isaac-demo`.
-4. A Render instala as dependências e inicia o `gunicorn`. O endpoint `/healthz` deve retornar status 200.
-5. Quando o deploy ficar **Live**, use a URL `https://...onrender.com` exibida na sua conta e compartilhe com a turma.
-6. Login da demo: **admin/admin**. O papel interno é **Gerente**, e todas as rotas de escrita são bloqueadas no servidor, mesmo com requisições manuais.
+## Credenciais de exercício
 
-## O que o modo demo não faz
+- **Usuário:** `admin`
+- **Senha:** `admin`
+- **Perfil:** `Admin` — permite as ações administrativas já existentes no ERP.
 
-- Não salva cadastro, estoque ou venda. É **somente visualização**. Explore telas, laboratório SQL e exercícios.
-- Não deve conter clientes, credenciais, dados financeiros ou documentos reais.
-- Não substitui autenticação individual, proteção contra abuso, auditoria de segurança ou infraestrutura de produção.
+Qualquer visitante pode utilizar a conta e modificar, excluir, vender ou cadastrar registros. O banco é compartilhado durante a execução e os dados não devem ser usados para trabalhos permanentes.
 
-## Por que os dados reiniciam?
+## Reset seguro em cada inicialização
 
-No plano Free, o SQLite local fica num **sistema de arquivos efêmero**. Reinícios, novos deploys e suspensão apagam alterações. O Flask cria uma base de demonstração com registros fictícios ao iniciar. Para persistência, planeje PostgreSQL e usuários próprios. Os bancos PostgreSQL Free da Render também têm expiração.
+Com `ERP_DEMO_MODE=1` e `ERP_DEMO_ADMIN_MODE=1`, o Flask força o URI `sqlite:///erp_demo_publica.db`. O `DATABASE_URL` fornecido por engano é ignorado **nesse modo**. A função `initialize_storage` executa `db.drop_all()` e `db.create_all()` **apenas nesse SQLite isolado**, depois recria os perfis, a conta admin e os registros de exemplo. A execução normal ou somente leitura não apaga banco existente.
 
-## Configuração técnica
+**Render:** use um worker Gunicorn, por exemplo `gunicorn app:app` com `WEB_CONCURRENCY=1`. Cada boot, novo deploy e eventual reinício de worker pode apagar os exercícios. Não há cron de reset nem persistência garantida.
 
-- Build: `pip install -r requirements.txt`.
-- Start: `gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 4 app:app`.
-- Health: `GET /healthz`.
-- Vars: `ERP_DEMO_MODE=1`, `ERP_COOKIE_SECURE=1` e `ERP_SECRET_KEY` (gerada automaticamente).
+## Variáveis configuradas no serviço existente
 
-Para executar normalmente na máquina, mantenha `ERP_DEMO_MODE=0`, rode `flask --app app init-admin` e escolha uma senha própria forte.
+| Chave | Valor |
+| --- | --- |
+| `ERP_DEMO_MODE` | `1` |
+| `ERP_DEMO_ADMIN_MODE` | `1` |
+| `ERP_DEMO_PASSWORD` | `admin` |
+| `ERP_COOKIE_SECURE` | `1` |
+| `ERP_SECRET_KEY` | chave aleatória secreta |
+
+O serviço antigo chamado `ERP` na Render, ligado a outro repositório, não deve ser alterado.
+
+## Validando
+
+A CI testa o modo leitura sem poderes de escrita e o modo Admin isolado com cadastro de produto, criação de usuário e reset explícito. O modo de produção local continua com senha de administrador escolhida pelo operador.

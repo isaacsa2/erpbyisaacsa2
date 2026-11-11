@@ -48,3 +48,8 @@ jobs:
         env:
           ERP_DEMO_MODE: '1'
         run: python -m unittest checks.test_render_demo -v
+      - name: Test editable Admin demo and reset
+        env:
+          ERP_DEMO_MODE: "1"
+          ERP_DEMO_ADMIN_MODE: "1"
+        run: python -m unittest checks.test_render_demo_admin -v
