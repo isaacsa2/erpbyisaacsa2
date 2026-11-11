@@ -75,7 +75,7 @@ python -m http.server 8000
 # Abra http://127.0.0.1:8000/static/laboratorio/
 ```
 
-Ou, depois de iniciar o ERP Flask, abra `http://127.0.0.1:5000/static/laboratorio/`.
+Ou, depois de iniciar o ERP Flask, abra `http://127.0.0.1:5000/static/laboratorio/index.html`.
 
 **SQL em SQLite isolado, sem tocar no ERP:**
 
