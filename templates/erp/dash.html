@@ -1,3 +1,5 @@
+{# GUIA: Indicadores financeiros e gráficos calculados a partir do banco. #}
+{# O Python entrega os registros; o Jinja monta a página com eles. #}
 {% extends "base.html" %}
 {% block title %}Dashboard -  ERP by Isaac{% endblock %}
 
@@ -11,10 +13,12 @@
 
     <!-- Filtros de período -->
     <div class="d-flex justify-content-end mb-3">
-        <form method="get" class="d-flex align-items-center">
+        {# GET envia filtros de consulta na URL. #}
+<form method="get" class="d-flex align-items-center">
             <label class="me-2">Período:</label>
             <select name="days" class="form-select select-enhanced me-2" onchange="this.form.submit()">
-                {% for option in [1,7,14,30,60,120] %}
+                {# A repetição abaixo mostra cada registro em uma linha ou cartão. #}
+{% for option in [1,7,14,30,60,120] %}
                     <option value="{{ option }}" {% if data.days == option %}selected{% endif %}>
                         {% if option == 1 %}Últimas 24h{% else %}Últimos {{ option }} dias{% endif %}
                     </option>
@@ -183,6 +187,7 @@
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+// JavaScript recebe dados já enviados pelo Python e desenha os gráficos.
 const cashFlowCtx = document.getElementById('cashFlowChart').getContext('2d');
 new Chart(cashFlowCtx, {
     type: 'line',
