@@ -13,14 +13,19 @@ from erp import erp_bp
 from aprendiz import learn_bp
 from models import db, User, Role, fmt
 
-# Ambiente de demonstração pública: dados fictícios e NENHUMA operação de escrita.
-# Desligado por padrão nos ambientes locais.
+# Modo de DEMONSTRAÇÃO: somente dados fictícios. A conta pública pode editar tudo.
+# Para proteger bancos reais, este modo força um SQLite exclusivo e temporário.
+# Ele fica desligado por padrão em instalações locais.
 DEMO_MODE = os.environ.get("ERP_DEMO_MODE") == "1"
 
 # Flask recebe as requisições HTTP e escolhe qual função responderá a cada URL.
 app = Flask(__name__)
 app.config.update(
-    SQLALCHEMY_DATABASE_URI=os.environ.get("DATABASE_URL", "sqlite:///erp_estudos.db"),
+    # Nunca usar DATABASE_URL da instalação real quando a demo pública está ativa.
+    SQLALCHEMY_DATABASE_URI=(
+        "sqlite:///erp_demo_faculdade.sqlite3" if DEMO_MODE
+        else os.environ.get("DATABASE_URL", "sqlite:///erp_estudos.db")
+    ),
     SQLALCHEMY_TRACK_MODIFICATIONS=False,
     SECRET_KEY=os.environ.get("ERP_SECRET_KEY") or secrets.token_hex(32),
     DEMO_MODE=DEMO_MODE,
@@ -59,11 +64,8 @@ def csrf_token():
 @app.before_request
 def enforce_csrf():
     """Confere o token antes de aceitar uma alteração enviada pelo navegador."""
-    # admin/admin é somente um VISITANTE no modo demo. Mesmo uma chamada HTTP
-    # direta não pode cadastrar, vender, excluir ou alterar registros.
-    if DEMO_MODE and request.method in {"POST", "PUT", "PATCH", "DELETE"}:
-        if request.endpoint not in {"erp.login", "erp.logout"}:
-            abort(403, description="Demo pública: somente leitura.")
+    # A turma pode fazer cadastros, vendas e exclusões na demo.
+    # A proteção CSRF permanece ativa para todas as alterações HTTP.
     if request.method in {"POST", "PUT", "PATCH", "DELETE"}:
         expected = session.get("_csrf_token")
         provided = request.form.get("_csrf_token") or request.headers.get("X-CSRF-Token")
@@ -157,8 +159,8 @@ def initialize_demo():
             db.session.add(Role(name=name))
     db.session.flush()
     if not User.query.filter_by(username="admin").first():
-        # A senha pública foi solicitada para a DEMO. O papel não é de Admin.
-        demo = User(username="admin", role=Role.query.filter_by(name="Gerente").first())
+        # A conta pública recebe Admin completo APENAS no SQLite temporário.
+        demo = User(username="admin", role=Role.query.filter_by(name="Admin").first())
         demo.set_password(os.environ.get("ERP_DEMO_PASSWORD", "admin"))
         db.session.add(demo)
     if not Customer.query.first():
@@ -187,9 +189,28 @@ def initialize_demo():
     db.session.commit()
 
 
-with app.app_context():
+def reset_demo_database():
+    """Descarta e recria os dados fictícios a cada inicialização da aplicação.
+
+    A URL do banco no modo demo é forçada a SQLite separado, independente de
+    DATABASE_URL. Portanto, este reset nunca toca o banco normal do ERP.
+    Importante: a demonstração deve executar com um único worker Gunicorn.
+    """
+    if not DEMO_MODE:
+        return
+    if db.engine.url.get_backend_name() != "sqlite":
+        raise RuntimeError("Reset demonstrativo só pode operar com SQLite.")
+    db.session.remove()
+    db.drop_all()
     db.create_all()
     initialize_demo()
+
+
+with app.app_context():
+    if DEMO_MODE:
+        reset_demo_database()
+    else:
+        db.create_all()
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=int(os.environ.get("PORT", "5000")))
