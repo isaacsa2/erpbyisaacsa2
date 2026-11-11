@@ -1,3 +1,5 @@
+{# GUIA: Comprovante de venda didático, não é um documento fiscal oficial. #}
+{# O HTML mostra a interface; dados entre chaves duplas são preenchidos pelo Jinja. #}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -101,7 +103,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for item in nfe_data.sale_items %}  <!-- Alterado para sale_items -->
+                            {# for percorre uma coleção de registros preparada no Python. #}
+{% for item in nfe_data.sale_items %}  <!-- Alterado para sale_items -->
                             <tr>
                                 <td>{{ item.name }}</td>
                                 <td>{{ item.qty }}</td>
@@ -144,6 +147,7 @@
     </div>
 
     <script>
+// Lógica do navegador: não altera diretamente o banco de dados.
         // Auto-print ao carregar a página (opcional)
         window.onload = function() {
             // Descomente a linha abaixo se quiser que imprima automaticamente
