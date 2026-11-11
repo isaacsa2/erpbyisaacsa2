@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Modo Aprendiz | ERP by Isaac{% endblock %}
+{% block content %}
+<section class="ap-hero"><p class="ap-eyebrow">LABORATÓRIO DA FACULDADE</p><h1>Modo Aprendiz</h1>
+<p>Entenda o sistema por dentro. Cada aula mostra uma função, classe ou arquivo <strong>real deste ERP</strong>, explicado para iniciantes.</p>
+<p>Os trechos são somente leitura e não executam código do visitante.</p></section>
+<div class="ap-grid">{% for t in topics %}
+<a class="ap-tile" href="{{ url_for('aprendiz.topic_page',topic_id=t.id) }}">
+<small>{{t.category}}</small><h2>{{t.title}}</h2><p>{{t.description}}</p><strong>Ver código real →</strong></a>
+{% endfor %}</div>
+<p class="mt-4"><a href="{{ url_for('erp.aulas') }}">Laboratório SQL</a> · <a href="{{ url_for('static', filename='laboratorio/index.html') }}">Exercícios JavaScript</a></p>
+{% endblock %}

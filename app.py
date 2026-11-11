@@ -7,6 +7,8 @@ import secrets
 import click
 from datetime import datetime, date
 from flask import Flask, abort, render_template, request, session
+from flask_login import current_user
+from learn_mode import learn_bp
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from erp import erp_bp
@@ -39,6 +41,7 @@ def load_user(user_id):
 
 # As rotas (URLs) do ERP ficam organizadas no arquivo erp.py.
 app.register_blueprint(erp_bp)
+app.register_blueprint(learn_bp)
 
 # O token CSRF impede que um terceiro envie um formulário em nome do usuário.
 def csrf_token():
@@ -52,6 +55,12 @@ def csrf_token():
 @app.before_request
 def enforce_csrf():
     """Confere o token antes de aceitar uma alteração enviada pelo navegador."""
+    # A conta compartilhada da demonstração só pode ler dados.
+    if (os.environ.get("DEMO_PUBLIC") == "1" and current_user.is_authenticated
+        and current_user.username == "admin"
+        and request.method in {"POST", "PUT", "PATCH", "DELETE"}
+        and request.endpoint != "erp.logout"):
+        abort(403, description="Demo pública: somente leitura.")
     if request.method in {"POST", "PUT", "PATCH", "DELETE"}:
         expected = session.get("_csrf_token")
         provided = request.form.get("_csrf_token") or request.headers.get("X-CSRF-Token")
@@ -61,7 +70,7 @@ def enforce_csrf():
 @app.context_processor
 def inject_globals():
     """Disponibiliza valores e funções para todas as páginas HTML."""
-    return {"now": datetime.now(), "date": date, "csrf_token": csrf_token, "fmt": fmt}
+    return {"now": datetime.now(), "date": date, "csrf_token": csrf_token, "fmt": fmt, "demo_public": os.environ.get("DEMO_PUBLIC") == "1"}
 
 @app.template_filter("fmt")
 def jinja_fmt(v):
@@ -132,6 +141,26 @@ def create_user(username, role, password):
 
 with app.app_context():
     db.create_all()
+    # Apenas na DEMO pública: usuário compartilhado sem permissões de escrita.
+    # Nunca habilite DEMO_PUBLIC com dados pessoais ou produtivos.
+    if os.environ.get("DEMO_PUBLIC") == "1":
+        for role_name in ("Admin", "Gerente", "Caixa"):
+            if not Role.query.filter_by(name=role_name).first():
+                db.session.add(Role(name=role_name))
+        db.session.commit()
+        demo = User.query.filter_by(username="admin").first()
+        if demo is None:
+            demo = User(username="admin", role=Role.query.filter_by(name="Admin").first())
+            db.session.add(demo)
+        demo.set_password("admin")
+        db.session.commit()
+        from models import Product, Customer
+        if not Customer.query.first():
+            db.session.add(Customer(name="Cliente de Demonstração", email="exemplo@invalid.test"))
+        if not Product.query.first():
+            for title, price, cost, stock in (("Caderno de estudos",18.90,11.20,25),("Caneta de estudos",3.50,1.10,70),("Borracha de estudos",2.25,0.80,5)):
+                db.session.add(Product(name=title, price=price, cost=cost, stock=stock, category="Estudos"))
+        db.session.commit()
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=int(os.environ.get("PORT", "5000")))

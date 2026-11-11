@@ -114,3 +114,7 @@ Faça um fork, crie uma branch, implemente um exercício e envie um **Pull Reque
 Distribuído sob **GNU Affero General Public License v3.0 (AGPL-3.0)**, conforme o arquivo [`LICENSE`](LICENSE) deste repositório. Preserve os avisos de licença, os direitos dos autores e disponibilize o código-fonte quando exigido pela AGPL.
 
 Projeto educacional mantido por [isaacsa2](https://github.com/isaacsa2). Não é afiliado a instituições de ensino ou serviços fiscais.
+
+
+## Render + Modo Aprendiz
+A versão pública da faculdade usa uma conta de demonstração `admin/admin` **somente leitura** e dados fictícios. O Modo Aprendiz exibe trechos reais do código do servidor. Veja [documentação de implantação](docs/RENDER_E_MODO_APRENDIZ.md).
