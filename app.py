@@ -10,6 +10,7 @@ from flask import Flask, abort, render_template, request, session, jsonify
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from erp import erp_bp
+from aprendiz import learn_bp
 from models import db, User, Role, fmt
 
 # Ambiente de demonstração pública: dados fictícios e NENHUMA operação de escrita.
@@ -44,6 +45,7 @@ def load_user(user_id):
 
 # As rotas (URLs) do ERP ficam organizadas no arquivo erp.py.
 app.register_blueprint(erp_bp)
+app.register_blueprint(learn_bp)
 
 # O token CSRF impede que um terceiro envie um formulário em nome do usuário.
 def csrf_token():

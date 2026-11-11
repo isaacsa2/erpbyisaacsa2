@@ -9,6 +9,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='erp_style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='aprendiz.css') }}">
+    <script src="{{ url_for('static', filename='aprendiz.js') }}" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
@@ -129,6 +131,26 @@
         <p>&copy; 2025 ERP by Isaac - Todos os direitos reservados</p>
     </footer>
 </div>
+
+{# O painel mostra código lido diretamente dos arquivos da versão em execução. #}
+{% if current_user.is_authenticated %}
+<div id="erp-aprendiz" data-pagina="{{ request.endpoint }}" data-api="{{ url_for('aprendiz.api') }}">
+  <button type="button" class="aprendiz-open" data-aprendiz-open aria-expanded="false" aria-controls="aprendiz-painel">Modo Aprendiz</button>
+  <aside class="aprendiz-panel" id="aprendiz-painel" data-aprendiz-panel hidden aria-label="Código real do ERP">
+    <div class="aprendiz-heading">
+      <h2 data-aprendiz-title>Como funciona esta tela?</h2>
+      <button type="button" class="aprendiz-close" data-aprendiz-close aria-label="Fechar Modo Aprendiz">Fechar</button>
+    </div>
+    <p class="aprendiz-message" data-aprendiz-concept>Selecione um trecho para entender como o ERP foi programado.</p>
+    <div class="aprendiz-tabs" data-aprendiz-tabs role="tablist"></div>
+    <div class="aprendiz-location"><span data-aprendiz-path></span>
+      <a data-aprendiz-github href="#" target="_blank" rel="noopener noreferrer">Ver no GitHub</a>
+      <button type="button" data-aprendiz-copy class="aprendiz-copy">Copiar código</button>
+    </div>
+    <pre class="aprendiz-pre"><code data-aprendiz-code>Selecione uma tela.</code></pre>
+  </aside>
+</div>
+{% endif %}
 
 <!-- Botão tema -->
 <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
