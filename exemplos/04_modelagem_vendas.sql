@@ -1,3 +1,8 @@
+-- GUIA: modelo relacional de sistema de vendas fictício.
+-- Entidade vira tabela; PRIMARY KEY identifica cada linha;
+-- REFERENCES indica a chave da tabela relacionada.
+-- Venda N:N Produto precisa da tabela intermediária item_venda.
+-- Executar somente em uma base nova/em memória, nunca no ERP real.
 -- Exercício independente inspirado na atividade prática de sistema de vendas.
 -- Fonte didática: Relational_Data_Foundations.pdf, atividade de modelagem (página 18).
 -- SQLite: execute em uma base NOVA / em memória; nenhuma tabela do ERP é alterada.

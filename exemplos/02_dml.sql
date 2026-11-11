@@ -1,4 +1,8 @@
--- DML: Data Manipulation Language — inserir, atualizar e excluir registros
+-- GUIA: DML modifica registros depois da criação das tabelas.
+-- INSERT adiciona linhas, UPDATE altera linhas, DELETE remove linhas.
+-- WHERE limita quais registros serão alterados ou removidos.
+-- Atenção: sem WHERE, UPDATE e DELETE podem afetar TODAS as linhas.
+-- Os dados deste exemplo são fictícios.
 INSERT INTO cliente (id, nome, email) VALUES
  (1, 'Ana (fictícia)', 'ana@exemplo.invalid'),
  (2, 'Bruno (fictício)', 'bruno@exemplo.invalid');

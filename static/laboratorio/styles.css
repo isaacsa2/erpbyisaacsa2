@@ -1,8 +1,17 @@
+/*
+  COMO LER O CSS
+  .card significa elemento com class="card".
+  body altera a tag <body> inteira.
+  background é a cor/fundo; padding é espaço interno; margin é espaço externo.
+  Comece mudando o background do botão .btn para ver o resultado na tela.
+*/
+/* Estilos gerais da página */
 :root {font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#eaf1f9;background:#0d131b;color-scheme:dark;font-size:16px}
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;line-height:1.55;background:radial-gradient(circle at 15% 0,#1a3342 0,transparent 40%),#0d131b}
 a{color:#9ee5ec}
 a:hover{text-decoration:underline}
+/* Layout: container limita a largura; flex e grid distribuem elementos. */
 .container{max-width:1190px;margin:auto;padding:20px clamp(15px,3vw,28px)}
 header{display:flex;justify-content:space-between;align-items:center;gap:20px;padding-top:24px;padding-bottom:12px;flex-wrap:wrap}
 .brand{font-size:1.1rem;font-weight:800;letter-spacing:.4px;color:#fff;text-decoration:none}
@@ -19,6 +28,7 @@ h3{font-size:1rem;margin:.8rem 0 .3rem}
 .summary strong{display:block;font-size:2.5rem;color:#ffad74;line-height:1.2}
 .summary p{margin:3px 0 15px;color:#c2d0da}.summary p:last-child{margin:0}
 .highlight{color:#ffb380}
+/* Botões de filtro e cards (cada card é um exercício). */
 .pills{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 28px}
 .pills button{color:#dce6ed;border:1px solid #344a5a;background:#1b2a37;padding:9px 14px;border-radius:999px;cursor:pointer}
 .pills button[aria-pressed="true"]{background:#e57933;color:#151616;border-color:#e57933;font-weight:800}
@@ -35,6 +45,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid #ffae7d;outline-offset
 .btn{border:0;background:#f08b49;color:#11171b;padding:10px 14px;border-radius:9px;font-weight:800;cursor:pointer;font:inherit;white-space:nowrap}
 .btn:hover{background:#ffaf73}.btn-secondary{background:#294355;color:#e4f3ff}.btn-secondary:hover{background:#35556b}.btn-mini{font-size:.8rem;padding:6px 9px;background:#294355;color:#e4f3ff}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+/* Caixa de resultado: o seletor [data-status="erro"] aplica o visual de erro. */
 .output{border:1px solid #345363;background:#0e1b25;color:#bfead7;padding:12px 13px;border-radius:10px;min-height:48px;white-space:pre-wrap;overflow-wrap:anywhere;margin:13px 0 4px;font-size:.95rem}
 .output[data-status="erro"]{color:#ffd6c2;border-color:#c66b57;background:#351f20}
 small,.helper{color:#afc2d0}.helper{display:block;font-size:.83rem;margin-top:8px}
@@ -47,5 +58,6 @@ ul{padding-left:23px}.item-carrinho span,.nota span{overflow-wrap:anywhere;min-w
 .path{background:#192d3a;border:1px solid #3d5769;border-radius:13px;padding:20px;margin:30px 0 14px}
 .path p{margin:.3rem 0 0;color:#bfcedb}
 footer{border-top:1px solid #2e3f50;margin-top:40px;padding-top:22px;padding-bottom:44px;color:#b0c2cd}
+/* Ajustes de responsividade: telas menores recebem um layout em coluna. */
 @media(max-width:810px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:1fr}h1{letter-spacing:-.4px}}
 @media(max-width:430px){.card{padding:15px}.pills button{flex:1}.summary{padding:17px}}

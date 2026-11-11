@@ -1,13 +1,25 @@
-/** Funções puras: os mesmos cálculos podem ser testados sem navegador. */
+/**
+ * FUNÇÕES DOS EXERCÍCIOS
+ * Este arquivo contém somente os cálculos. Não depende dos botões HTML.
+ * Cada função recebe uma entrada, executa uma regra e devolve o resultado.
+ * O app.mjs usa import para acessar estas funções.
+ * Veja docs/GUIA_PARA_INICIANTES.md para acompanhar um exemplo completo.
+ */
+// Os campos HTML fornecem texto. Convertemos para número e validamos.
 export function numero(valor) {
   if (valor === null || String(valor).trim() === "") throw new Error("Informe um número.");
+  // Aceita o formato brasileiro: "2,5" vira "2.5" antes da conversão.
   const n = Number(String(valor).replace(",", "."));
   if (!Number.isFinite(n)) throw new Error("Use um número válido.");
   return n;
 }
 
-export function somar(a, b) { return numero(a) + numero(b); }
+// Soma dois números. Sem conversão, "2" + "3" seria o texto "23".
+export function somar(a, b) {
+  return numero(a) + numero(b);
+}
 
+// Datas: apenas subtrair os anos não basta; conferimos o aniversário.
 export function idade(dataISO, hoje = new Date()) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dataISO)) throw new Error("Escolha uma data de nascimento.");
   const [ano, mes, dia] = dataISO.split("-").map(Number);
@@ -21,6 +33,7 @@ export function idade(dataISO, hoje = new Date()) {
   return anos;
 }
 
+// Decisão: valida os três lados antes de classificar o triângulo.
 export function classificarTriangulo(a, b, c) {
   const lados = [numero(a), numero(b), numero(c)];
   if (lados.some(n => n <= 0)) throw new Error("Os três lados devem ser positivos.");
@@ -31,12 +44,15 @@ export function classificarTriangulo(a, b, c) {
   return "Escaleno";
 }
 
+// Repetição: construímos dez linhas sem copiar e colar dez multiplicações.
 export function tabuada(valor) {
   const n = numero(valor);
   if (!Number.isSafeInteger(n) || Math.abs(n) > 1000) throw new Error("Use um número inteiro entre -1000 e 1000.");
   return Array.from({ length: 10 }, (_, idx) => ({ fator: idx + 1, resultado: n * (idx + 1) }));
 }
 
+// Parcelamento fictício: cada plano possui quantidade de parcelas e taxa fixa.
+// Usamos centavos inteiros para não perder um centavo ao dividir os valores.
 export function parcelas(principalReais) {
   const p = numero(principalReais);
   if (!(p > 0) || p > 1000000) throw new Error("Informe valor maior que zero e até R$ 1.000.000.");
@@ -51,12 +67,14 @@ export function parcelas(principalReais) {
   });
 }
 
+// PDV: R$ 1,10 é guardado como 110 centavos para evitar erros de precisão.
 export function precoCentavos(reais) {
   const n = numero(reais);
   if (n < 0 || n > 1000000) throw new Error("Preço fora do limite do exercício.");
   return Math.round((n + Number.EPSILON) * 100);
 }
 
+// reduce percorre os itens e soma: quantidade × preço de cada produto.
 export function totalCarrinho(itens) {
   return itens.reduce((acc, item) => {
     if (!Number.isSafeInteger(item.quantidade) || item.quantidade <= 0 ||
@@ -73,6 +91,7 @@ export function trocoCentavos(pagoEmReais, total) {
   return pago - total;
 }
 
+// Condições encadeadas: exemplo apenas didático, não substitui avaliação clínica.
 export function imc(peso, altura) {
   const p = numero(peso), h = numero(altura);
   if (p <= 0 || h <= 0 || h > 3 || p > 500) throw new Error("Confira peso (kg) e altura (m).");
@@ -83,6 +102,7 @@ export function imc(peso, altura) {
   return { valor, categoria };
 }
 
+// Array é uma lista: calculamos total, média, maior e menor de seus elementos.
 export function resumoArray(valores) {
   if (!valores.length) return { total: 0, media: null, maior: null, menor: null };
   return { total: valores.reduce((a,b)=>a+b,0), media: valores.reduce((a,b)=>a+b,0)/valores.length,

@@ -4,6 +4,12 @@ Projeto de estudo de um **ERP (Enterprise Resource Planning)** para uma padaria 
 
 > **Uso educacional e local.** Este projeto é uma base para aprender e experimentar, **não é um sistema de produção**. Não publique na Internet sem realizar uma auditoria de segurança, privacidade, regras fiscais e testes adicionais. A tela chamada "NF-e" é uma simulação de comprovante: **não emite nota fiscal autorizada pela SEFAZ**.
 
+## Primeiro contato: um guia para quem está aprendendo
+
+**Não precisa saber Python para começar.** Leia o [Guia para iniciantes](docs/GUIA_PARA_INICIANTES.md) e experimente o laboratório de HTML, CSS e JavaScript no navegador.
+
+O código do laboratório tem comentários em português explicando as partes principais; os exercícios SQL também trazem notas sobre DDL, DML, filtros, tabelas e relacionamentos. Os comentários não mudam a execução: servem para entender como cada passo funciona.
+
 ## Funcionalidades para estudar
 
 - Cadastro de **clientes, fornecedores e produtos**, incluindo estoque;

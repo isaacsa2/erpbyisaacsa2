@@ -1,3 +1,7 @@
+// TESTES: cada test() verifica uma regra com valores conhecidos.
+// assert.equal compara resultado e valor esperado.
+// assert.throws verifica se uma entrada inválida foi rejeitada.
+// Rode: node --test static/laboratorio/testes.mjs
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { somar, idade, classificarTriangulo, tabuada, parcelas, precoCentavos,

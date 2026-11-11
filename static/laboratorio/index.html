@@ -1,4 +1,12 @@
 <!doctype html>
+<!--
+  GUIA PARA LER ESTE ARQUIVO
+  HTML = estrutura da página: textos, botões e campos.
+  CSS (styles.css) = aparência: cores e organização.
+  JavaScript (app.mjs) = eventos e resultados.
+  Comentários entre estas marcas não são exibidos na página.
+  Guia: docs/GUIA_PARA_INICIANTES.md.
+-->
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
@@ -18,6 +26,7 @@
         <div class="eyebrow">Laboratório interativo • faculdade</div>
         <h1 id="titulo">Aprender programação <strong>fazendo.</strong></h1>
         <p class="lead">Exercícios executáveis de algoritmos, HTML, CSS e JavaScript, construídos a partir dos temas dos materiais de aula. Use o navegador, altere os códigos e observe a saída. <b>Funciona offline</b>, sem login, sem mandar dados ao servidor.</p>
+        <p><a href="https://github.com/isaacsa2/erpbyisaacsa2/blob/main/docs/GUIA_PARA_INICIANTES.md">Guia passo a passo para iniciantes</a> · <a href="./app.mjs">Código dos botões</a> · <a href="./logica.mjs">Código dos cálculos</a></p>
         <p><a href="./logica.mjs">Ver as funções JavaScript</a> · <a href="https://github.com/isaacsa2/erpbyisaacsa2/blob/main/docs/MAPA_DAS_AULAS.md">Roteiro das 23 aulas (no repositório)</a></p>
       </div>
       <aside class="summary" aria-label="Resumo do laboratório">
@@ -25,6 +34,15 @@
         <strong>2</strong><p>áreas de estudo: algoritmos e banco de dados</p>
         <strong>100%</strong><p>dados fictícios e simulações locais</p>
       </aside>
+    </section>
+
+    <!-- Cada card abaixo corresponde a um exercício. data-categoria permite os filtros. -->
+    <!-- Este mini-resumo aparece no navegador para explicar o caminho do código. -->
+    <section class="path" aria-labelledby="guia-titulo">
+      <div class="eyebrow">Comece por aqui</div>
+      <h2 id="guia-titulo">Como um clique vira um resultado?</h2>
+      <p><strong>HTML</strong> cria o campo e o botão. <strong>JavaScript</strong> lê os números, chama a função de cálculo e altera o resultado na página. <strong>CSS</strong> organiza a apresentação.</p>
+      <p>Teste a calculadora e depois procure <code>form-soma</code> em <code>index.html</code> e <code>app.mjs</code>. São as duas pontas da mesma funcionalidade.</p>
     </section>
 
     <section id="atividades" aria-labelledby="titulo-atividades">
@@ -41,11 +59,18 @@
           <div class="module-tag">Temas 1, 2, 5 e 7 · Entradas, variáveis e soma</div>
           <h2>Calculadora de soma</h2>
           <p>Aprenda entrada → processamento → saída. O JavaScript lê dois números, calcula e atualiza o DOM.</p>
+          <!--
+            EXEMPLO DE FLUXO:
+            Este id="form-soma" identifica o formulário.
+            O app.mjs procura esse id e reage ao envio (submit).
+            value define um valor inicial; required evita o campo vazio.
+          -->
           <form id="form-soma">
             <label>Primeiro número<input type="number" id="soma-a" step="any" value="2" required></label>
             <label>Segundo número<input type="number" id="soma-b" step="any" value="3" required></label>
             <button class="btn" type="submit">Somar</button>
           </form>
+          <!-- O JavaScript coloca o resultado neste output pelo id="resultado-soma". -->
           <output class="output" id="resultado-soma" aria-live="polite">Altere os números e clique em Somar.</output>
           <details><summary>Veja a lógica</summary><pre>const n1 = Number(campoA.value);
 const n2 = Number(campoB.value);
@@ -170,6 +195,7 @@ se o aniversário ainda não chegou:
       </div>
     </section>
 
+    <!-- Aqui aparecem os conceitos; os comandos executáveis estão em exemplos/*.sql. -->
     <section id="banco" class="path" aria-labelledby="banco-titulo">
       <div class="eyebrow">Sistemas de Informação · Modelagem relacional</div>
       <h2 id="banco-titulo">Aula prática do professor Ramon Paixão: sistema de vendas</h2>
@@ -179,6 +205,7 @@ se o aniversário ainda não chegou:
     </section>
   </main>
   <footer class="container">ERP by Isaac · Material independente de apoio ao estudo. Exercícios adaptados dos temas das aulas, sem redistribuir os PDFs dos professores. Não usar em produção.</footer>
+  <!-- type="module" permite usar import/export entre os arquivos JavaScript. -->
   <script type="module" src="./app.mjs"></script>
 </body>
 </html>
