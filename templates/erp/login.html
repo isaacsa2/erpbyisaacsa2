@@ -1,3 +1,5 @@
+{# GUIA: Tela de login: o servidor valida usuário e senha. #}
+{# O HTML mostra a interface; dados entre chaves duplas são preenchidos pelo Jinja. #}
 {% extends "base.html" %}
 
 {% block title %}Login - ERP{% endblock %}
@@ -7,7 +9,8 @@
     <div class="card p-4 shadow" style="width: 100%; max-width: 400px;">
         <h3 class="text-center mb-3">Login ERP</h3>
 
-        <form method="POST" action="{{ url_for('erp.login') }}">
+        {# Este formulário envia informações ao Flask. Mantenha o token CSRF existente. #}
+<form method="POST" action="{{ url_for('erp.login') }}">
 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <div class="mb-3">
                 <label for="username" class="form-label">Usuário</label>
