@@ -1,3 +1,5 @@
+{# GUIA PARA ALUNOS: Produtos: cadastro, preços, estoque e listagem. #}
+{# No Jinja, for percorre listas; if escolhe trechos; extends usa o layout compartilhado. #}
 {% extends "base.html" %}
 {% block title %}Produtos{% endblock %}
 
@@ -5,6 +7,7 @@
 <h2 class="mb-4">Produtos</h2>
 
 <!-- Busca -->
+{# GET envia filtros na URL, sem alterar o banco de dados. #}
 <form method="GET" class="mb-3 d-flex">
     <input type="text" name="q" class="form-control me-2" placeholder="Buscar produto..." value="{{ q }}">
     <button class="btn btn-outline-primary">Buscar</button>
@@ -41,7 +44,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for p in products %}
+                    {# for cria uma linha da lista para cada objeto enviado pelo servidor. #}
+{% for p in products %}
                     <tr>
                         <td>{{ p.name }}</td>
                         <td>{{ p.category }}</td>
