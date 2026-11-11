@@ -10,9 +10,14 @@
         <h3 class="text-center mb-3">Login ERP</h3>
         {% if config.get('DEMO_MODE') %}
         <div class="alert alert-info" role="note">
-          <strong>ERP para a faculdade (somente leitura).</strong>
-          Usuário <code>admin</code> e senha <code>admin</code>.
-          Todos os dados desta demonstração são fictícios. O modo aprendiz e os exercícios ajudam a estudar o código.
+          <strong>ERP para a faculdade — prática administrativa.</strong>
+          Acesse com <code>admin</code> / <code>admin</code>.
+          {% if config.get('DEMO_ADMIN_MODE') %}
+          Você pode cadastrar, editar, vender e excluir. As alterações são compartilhadas
+          e apagadas a cada reinício do serviço. Use apenas dados fictícios.
+          {% else %}
+          Este ambiente está em modo de consulta.
+          {% endif %}
         </div>
         {% endif %}
 

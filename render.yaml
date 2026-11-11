@@ -1,4 +1,4 @@
-# Demonstração didática; NÃO usar com dados verdadeiros.
+# Demonstração didática administrável com SQLite descartável; NÃO usar dados reais.
 services:
   - type: web
     name: erp-by-isaac-demo
@@ -10,6 +10,10 @@ services:
     envVars:
       - key: ERP_DEMO_MODE
         value: "1"
+      - key: ERP_DEMO_ADMIN_MODE
+        value: "1"
+      - key: ERP_DEMO_PASSWORD
+        value: "admin"
       - key: ERP_COOKIE_SECURE
         value: "1"
       - key: ERP_SECRET_KEY
