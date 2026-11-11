@@ -9,12 +9,14 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='erp_style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='aprendiz.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
 <div class="container mt-4">
 
     {% if current_user.is_authenticated %}
+        {% if demo_public %}<div class="alert alert-warning"><strong>Demo da faculdade:</strong> somente leitura, dados fictícios. Cadastros e vendas estão bloqueados para a conta compartilhada.</div>{% endif %}
         <ul class="nav-sector">
             <!-- Início -->
             <li class="nav-item sector-reports">
@@ -97,6 +99,7 @@
                     <i class="bi bi-mortarboard-fill"></i> <span class="nav-text">Laboratório SQL</span>
                 </a>
             </li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('aprendiz.index') }}"><i class="bi bi-book-half"></i> <span class="nav-text">Modo Aprendiz</span></a></li>
             <!-- Logout -->
             <li class="nav-item ms-auto">
                 {# POST envia os campos para uma rota Python validar e salvar. #}
@@ -122,6 +125,7 @@
 
     <!-- Conteúdo -->
     <div class="mt-3">
+        {% if aprendiz_suggestion %}<div class="alert alert-info">Veja como esta tela funciona: <a href="{{ url_for('aprendiz.topic_page', topic_id=aprendiz_suggestion.id) }}"><strong>{{ aprendiz_suggestion.title }} — código real</strong></a></div>{% endif %}
         {% block content %}{% endblock %}
     </div>
 
