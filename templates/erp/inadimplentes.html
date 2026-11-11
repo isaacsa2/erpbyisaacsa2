@@ -1,3 +1,5 @@
+{# GUIA: Relatório de clientes inadimplentes e sua regularização. #}
+{# O Python entrega os registros; o Jinja monta a página com eles. #}
 {% extends "base.html" %}
 
 {% block content %}
@@ -8,6 +10,7 @@
 </div>
 
 <!-- Filtro e busca -->
+{# GET envia filtros de consulta na URL. #}
 <form method="get" class="mb-3">
     <div class="input-group">
         <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Buscar cliente...">
@@ -28,7 +31,8 @@
             </tr>
         </thead>
         <tbody>
-            {% for customer in customers %}
+            {# A repetição abaixo mostra cada registro em uma linha ou cartão. #}
+{% for customer in customers %}
             <tr>
                 <td>{{ customer.name }}</td>
                 <td>{{ customer.defaulter_since.strftime('%d/%m/%Y') if customer.defaulter_since else 'N/A' }}</td>
