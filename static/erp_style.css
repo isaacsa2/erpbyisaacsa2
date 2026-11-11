@@ -1,3 +1,7 @@
+/* GUIA CSS: seletor { propriedade: valor; } muda a aparência dos elementos.
+ Classes começam com ponto (.container); variáveis começam com dois hífens (--primary-color).
+ Este arquivo controla a aparência, não as regras do ERP no Python. */
+
 /* Reset e Layout Centralizado  */
 html, body {
     height: 100%;
@@ -11,6 +15,7 @@ html, body {
 
 /* Variáveis de cores e gradientes
 ================================ */
+/* Valores definidos aqui podem ser usados em qualquer lugar com var(--nome). */
 :root {
     /* Cores principais atualizadas */
     --primary-color: #4361ee;
@@ -70,6 +75,7 @@ body {
         radial-gradient(circle at 85% 30%, rgba(239, 71, 111, 0.1) 0%, transparent 25%);
 }
 
+/* O tema claro aparece quando o JavaScript coloca a classe light-mode no body. */
 body.light-mode {
     background-color: var(--bg-light);
     color: var(--text-dark);
