@@ -1,3 +1,5 @@
+{# GUIA: Laboratório SQL: apresenta consultas fixas e os seus resultados. #}
+{# O HTML mostra a interface; dados entre chaves duplas são preenchidos pelo Jinja. #}
 {% extends "base.html" %}
 {% block title %}Laboratório SQL — ERP by Isaac{% endblock %}
 {% block content %}
@@ -6,7 +8,8 @@
   <div class="alert alert-success"><strong>Novidade das aulas:</strong> <a class="alert-link" href="{{ url_for('static', filename='laboratorio/index.html') }}">Abrir laboratório interativo</a> — JavaScript, loops, decisões, PDV online e anotações (funciona offline).</div>
   <p class="lead">Estude consultas reais das disciplinas de Banco de Dados, com resultados atuais do ERP.</p>
   <div class="alert alert-info">As consultas aqui são <strong>somente leitura</strong> e pré-definidas. Para praticar INSERT, UPDATE e DELETE sem riscos, execute <code>python exemplos/executar.py</code> no terminal.</div>
-  {% for item in outputs %}
+  {# for percorre uma coleção de registros preparada no Python. #}
+{% for item in outputs %}
   <section class="card shadow-sm p-3 mb-4">
     <h2 class="h4">{{ loop.index }}. {{ item.topic }}</h2>
     <pre class="bg-dark text-white p-3 rounded" style="white-space:pre-wrap;overflow-wrap:anywhere"><code>{{ item.sql }}</code></pre>

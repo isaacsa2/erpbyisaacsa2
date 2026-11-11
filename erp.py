@@ -1,3 +1,8 @@
+"""Rotas e regras do ERP.
+Cada @erp_bp.route associa uma URL a uma função Python.
+GET normalmente mostra dados; POST recebe formulários e executa operações.
+"""
+
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify, abort
 from datetime import datetime, date, timedelta
@@ -7,6 +12,7 @@ from models import db, fmt, models_page, Customer, Supplier, Product, Sale, Sale
 from models import add_treasury_entry, update_overdue_status, calculate_abc_curve, get_cash_flow_summary, add_monthly_fixed_costs # Funções auxiliares
 from functools import wraps
 
+# Um Blueprint agrupa as URLs deste módulo para o Flask registrar em app.py.
 erp_bp = Blueprint('erp', __name__, url_prefix='')
 
 # ----------------------------
@@ -16,6 +22,7 @@ erp_bp = Blueprint('erp', __name__, url_prefix='')
 PER_PAGE = models_page
 
 def get_fixed_costs_total(start_date, end_date):
+    """Soma despesas fixas registradas entre as datas informadas."""
     costs = TreasuryEntry.query.filter(
         TreasuryEntry.type == "Saida",
         TreasuryEntry.origin == "Custo Fixo",
@@ -25,6 +32,7 @@ def get_fixed_costs_total(start_date, end_date):
     return fmt(sum(c.amount for c in costs))
 
 def roles_required(*allowed_roles):
+    """Impede que usuários sem os perfis indicados entrem na rota."""
     def decorator(f):
         @wraps(f)
         def decorated(*args, **kwargs):
@@ -39,6 +47,7 @@ def roles_required(*allowed_roles):
     return decorator
 
 def create_receivable_from_sale(sale: Sale, days_until_due=7):
+    """Cria uma conta a receber associada à venda, sem duplicar."""
     if sale.receivable:
         return sale.receivable
     due = datetime.now().date() + timedelta(days=days_until_due)
@@ -53,12 +62,15 @@ def create_receivable_from_sale(sale: Sale, days_until_due=7):
     return ar
 
 def calculate_treasury_balance(entries):
+    """Soma entradas e subtrai saídas para calcular o saldo."""
     return sum(e.amount if e.type == 'Entrada' else -e.amount for e in entries)
 
 def get_global_treasury_balance():
+    """Busca o saldo geral registrado na tesouraria."""
     return TreasuryEntry.global_balance()
 
 def sum_fixed_costs(days=30):
+    """Soma os custos fixos lançados no período."""
     today = datetime.today().date()
     start_date = today - timedelta(days=days-1)
     
@@ -78,6 +90,7 @@ def sum_fixed_costs(days=30):
 # ----------------------------
 
 def get_dashboard_data(days=30):
+    """Reúne números que aparecem nos cartões e gráficos do dashboard."""
     # Dashboard é consulta; não executa lançamentos financeiros em GET.
 
     today = datetime.today().date()
@@ -146,6 +159,7 @@ def get_dashboard_data(days=30):
 @roles_required("Admin")
 @login_required
 def register():
+    """Cria contas de usuário por requisição JSON; exige perfil Admin."""
     data = request.get_json(silent=True) or {}
     username = data.get("username")
     password = data.get("password")
@@ -177,6 +191,7 @@ def register():
 @roles_required("Caixa", "Admin", "Gerente")
 @login_required
 def pdv_add_item():
+    """Verifica o estoque, adiciona um item ao carrinho e reserva as unidades."""
     product_id = request.form.get("product_id", type=int)
     quantity = request.form.get("quantity", type=int, default=1)
 
@@ -223,6 +238,7 @@ def pdv_add_item():
         )
         db.session.add(sale_item)
 
+    # A quantidade entra no carrinho e já é reservada: cancelar devolve esse estoque.
     product.stock -= quantity
     db.session.commit()
 
@@ -233,6 +249,7 @@ def pdv_add_item():
 @roles_required("Caixa", "Admin", "Gerente")
 @login_required
 def pdv_finish():
+    """Valida a venda, registra o pagamento e encerra o carrinho."""
     sale_id = session.get("current_sale")
     if not sale_id:
         flash("Nenhuma venda em andamento!", "danger")
@@ -255,11 +272,13 @@ def pdv_finish():
         return redirect(url_for("erp.pdv"))
 
     sale.customer_id = customer_id
+    # A venda só passa a 'Pago' após validar cliente e itens.
     sale.status = "Pago"
     sale.date = datetime.now()
 
     total = sum(i.subtotal for i in sale.items)
 
+    # A conclusão da venda registra dinheiro entrando na tesouraria.
     add_treasury_entry(
         "Entrada",
         total,
@@ -278,6 +297,7 @@ def pdv_finish():
 @roles_required("Caixa", "Admin", "Gerente")
 @login_required
 def pdv_cancel():
+    """Cancela o carrinho e devolve seus produtos ao estoque."""
     sale_id = session.get("current_sale")
     if sale_id:
         sale = Sale.query.get(sale_id)
@@ -297,6 +317,7 @@ def pdv_cancel():
 @roles_required("Caixa", "Admin", "Gerente")
 @login_required
 def pdv_remove_item(item_id):
+    """Remove um item do carrinho e devolve a quantidade ao estoque."""
     item = SaleItem.query.get_or_404(item_id)
     if item.sale_id != session.get("current_sale"):
         abort(403)
@@ -321,6 +342,7 @@ def pdv_remove_item(item_id):
 @roles_required("Caixa", "Admin", "Gerente")
 @login_required
 def pdv_change_customer():
+    """Altera o cliente da venda que está em andamento."""
     sale_id = session.get("current_sale")
     if not sale_id:
         flash("Nenhuma venda em andamento!", "danger")
@@ -345,6 +367,7 @@ def pdv_change_customer():
 @roles_required("Admin", "Gerente")
 @login_required
 def mark_as_defaulter(customer_id):
+    """Marca um cliente como inadimplente e registra o motivo."""
     customer = Customer.query.get_or_404(customer_id)
     reason = request.form.get("reason", "")
     
@@ -360,6 +383,7 @@ def mark_as_defaulter(customer_id):
 @roles_required("Admin", "Gerente")
 @login_required
 def regularize_customer(customer_id):
+    """Retira o status de inadimplência do cliente."""
     customer = Customer.query.get_or_404(customer_id)
     
     customer.is_defaulter = False
@@ -375,6 +399,7 @@ def regularize_customer(customer_id):
 @roles_required("Admin", "Gerente")
 @login_required
 def cancel_sale(sale_id):
+    """Cancela uma venda já registrada usando as regras do modelo Sale."""
     sale = Sale.query.get_or_404(sale_id)
     if sale.status != "Cancelado":
         sale.cancel()
@@ -388,6 +413,7 @@ def cancel_sale(sale_id):
 @roles_required("Admin", "Gerente")
 @login_required
 def undo_cancel_sale(sale_id):
+    """Reativa uma venda cancelada quando existe estoque suficiente."""
     sale = Sale.query.get_or_404(sale_id)
     if sale.status != "Pendente":
         try:
@@ -405,6 +431,7 @@ def undo_cancel_sale(sale_id):
 @roles_required("Admin", "Gerente")
 @login_required
 def receivables_pay(ar_id):
+    """Registra o recebimento e uma entrada na tesouraria."""
     ar = AccountReceivable.query.get_or_404(ar_id)
     if ar.status == "Pago":
         flash("Já está marcado como pago.", "warning")
@@ -439,6 +466,7 @@ def receivables_pay(ar_id):
 @roles_required("Admin", "Gerente")
 @login_required
 def payables_pay(ap_id):
+    """Registra o pagamento e uma saída na tesouraria."""
     ap = AccountPayable.query.get_or_404(ap_id)
     if ap.status == "Pago":
         flash("Já está marcado como pago.", "warning")
@@ -473,6 +501,7 @@ def payables_pay(ap_id):
 @erp_bp.route("/")
 @login_required
 def dashboard():
+    """Exibe o painel principal do sistema."""
     if current_user.role.name == "Caixa":
         return redirect(url_for("erp.pdv"))
     else: 
@@ -484,6 +513,8 @@ def dashboard():
 
 @erp_bp.route("/login", methods=["GET", "POST"])
 def login():
+    """Mostra o formulário e confere as credenciais enviadas."""
+    # POST processa dados enviados; GET normalmente mostra um formulário ou listagem.
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
@@ -506,6 +537,7 @@ def login():
 @erp_bp.route("/logout", methods=["POST"])
 @login_required
 def logout():
+    """Encerra a autenticação do usuário."""
     logout_user()
     flash("Logout realizado!", "info")
     return redirect(url_for("erp.login"))
@@ -515,6 +547,7 @@ def logout():
 @roles_required("Admin", "Gerente")
 @login_required
 def customers():
+    """Exibe ou cadastra clientes conforme o método da requisição."""
     if request.method == "POST":
         name = request.form["name"].strip()
         email = request.form.get("email")
@@ -544,6 +577,7 @@ def customers():
 @roles_required("Admin", "Gerente")
 @login_required
 def suppliers():
+    """Exibe ou cadastra fornecedores."""
     if request.method == "POST":
         name = request.form["name"].strip()
         contact = request.form.get("contact")
@@ -574,6 +608,7 @@ def suppliers():
 @roles_required("Admin", "Gerente")
 @login_required
 def products():
+    """Exibe ou cadastra produtos, seus preços e estoque."""
     if request.method == "POST":
         name = request.form["name"].strip()
         category = request.form.get("category")
@@ -607,6 +642,7 @@ def products():
 @roles_required("Admin", "Gerente")
 @login_required
 def sales():
+    """Lista vendas ou cadastra uma venda manual."""
     customers = Customer.query.order_by(Customer.name).all()
     products = Product.query.order_by(Product.name).all()
 
@@ -655,6 +691,7 @@ def sales():
 @roles_required("Admin", "Gerente")
 @login_required
 def treasury():
+    """Exibe o extrato e permite registrar entradas e saídas."""
     page = request.args.get("page", 1, type=int)
     qry = TreasuryEntry.query
 
@@ -692,6 +729,7 @@ def treasury():
 @roles_required("Admin", "Gerente")
 @login_required
 def receivables():
+    """Exibe e cadastra contas a receber."""
     customers = Customer.query.order_by(Customer.name).all()
 
     if request.method == "POST":
@@ -734,6 +772,7 @@ def receivables():
 @roles_required("Admin", "Gerente")
 @login_required
 def payables():
+    """Exibe e cadastra contas a pagar."""
     suppliers = Supplier.query.order_by(Supplier.name).all()
 
     if request.method == "POST":
@@ -774,6 +813,7 @@ def payables():
 @roles_required("Caixa", "Admin", "Gerente")
 @login_required
 def pdv():
+    """Carrega dados do carrinho, produtos e clientes para a página do PDV."""
     sale_id = session.get("current_sale")
     sale = None
     sale_items = []
@@ -800,6 +840,7 @@ def pdv():
 @roles_required("Caixa", "Admin", "Gerente")
 @login_required
 def nfe(sale_id):
+    """Monta um comprovante didático, sem emissão de nota fiscal real."""
     sale = Sale.query.get_or_404(sale_id)
 
     if not sale.customer:
@@ -833,6 +874,7 @@ def nfe(sale_id):
 @roles_required("Admin", "Gerente")
 @login_required
 def fixed_costs():
+    """Exibe e cadastra despesas recorrentes."""
     if request.method == "POST":
         name = request.form["name"].strip()
         description = request.form.get("descricao", "").strip()
@@ -858,6 +900,7 @@ def fixed_costs():
 @roles_required("Admin", "Gerente")
 @login_required
 def defaulters_report():
+    """Exibe a lista de clientes marcados como inadimplentes."""
     page = request.args.get("page", 1, type=int)
     q = request.args.get("q", "").strip()
     

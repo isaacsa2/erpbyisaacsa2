@@ -1,3 +1,5 @@
+{# GUIA: Formulário e tabela de fornecedores. #}
+{# As variáveis exibidas na tela chegam do Python pela função render_template. #}
 {% extends "base.html" %}
 {% block title %}Fornecedores{% endblock %}
 
@@ -5,6 +7,7 @@
 <h2 class="mb-4">Fornecedores</h2>
 
 <!-- Busca -->
+{# GET envia filtros de pesquisa pela URL. #}
 <form method="GET" class="mb-3 d-flex">
     <input type="text" name="q" class="form-control me-2" placeholder="Buscar fornecedor..." value="{{ q }}">
     <button class="btn btn-outline-primary">Buscar</button>
@@ -42,7 +45,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for s in suppliers %}
+                    {# Este laço cria uma linha para cada registro recebido do banco. #}
+{% for s in suppliers %}
                     <tr>
                         <td>{{ s.name }}</td>
                         <td>{{ s.contact }}</td>

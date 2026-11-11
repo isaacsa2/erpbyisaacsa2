@@ -1,3 +1,5 @@
+{# GUIA: Contas a pagar, vencimentos e registro de pagamento. #}
+{# As variáveis exibidas na tela chegam do Python pela função render_template. #}
 {% extends "base.html" %}
 {% block title %}Contas a Pagar{% endblock %}
 
@@ -7,12 +9,14 @@
 <!-- Formulário em card -->
 <div class="card mb-4">
     <div class="card-body">
-        <form method="POST" class="row g-3">
+        {# POST envia dados para validação no servidor. #}
+<form method="POST" class="row g-3">
 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <div class="col-md-3">
                 <select name="supplier" class="form-select" required>
                     <option value="">Selecione o Fornecedor</option>
-                    {% for s in suppliers %}
+                    {# Este laço cria uma linha para cada registro recebido do banco. #}
+{% for s in suppliers %}
                         <option value="{{ s.id }}">{{ s.name }}</option>
                     {% endfor %}
                 </select>

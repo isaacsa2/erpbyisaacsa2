@@ -1,3 +1,7 @@
+"""Gerador de dados fictícios para experimentar o ERP.
+Use somente em banco de testes e verifique os parâmetros antes de executar.
+"""
+
 import math
 import random
 from datetime import datetime, timedelta, date
@@ -9,6 +13,7 @@ from models import (
     TreasuryEntry, Supplier, fmt
 )
 
+# Faker cria nomes e endereços inventados; não use dados reais das pessoas.
 fake = Faker("pt_BR")
 
 # -------------------------------------------------------
@@ -54,6 +59,7 @@ def _commit_batch(contador, label="registros"):
 # seed_fornecedores
 # -------------------------------------------------------
 def seed_fornecedores():
+    """Insere fornecedores inventados se o CNPJ ainda não estiver cadastrado."""
     criados = 0
     for f in FORNECEDORES:
         if not Supplier.query.filter_by(cnpj=f["cnpj"]).first():
@@ -70,6 +76,7 @@ def seed_fornecedores():
 # seed_products
 # -------------------------------------------------------
 def seed_products():
+    """Insere produtos demonstrativos sem repetir os existentes."""
     criados = 0
     for p in PRODUTOS:
         if not Product.query.filter_by(name=p["name"]).first():
@@ -85,6 +92,7 @@ def seed_products():
 # seed_customers_only
 # -------------------------------------------------------
 def seed_customers_only(num_customers=150):
+    """Cria clientes fictícios para testes de cadastro e listagem."""
     used_emails = set()
     objs = []
     for _ in range(num_customers):
@@ -106,6 +114,7 @@ def seed_customers_only(num_customers=150):
 # seed_despesas_fixas
 # -------------------------------------------------------
 def seed_despesas_fixas(dias):
+    """Simula despesas recorrentes no período solicitado."""
     today = datetime.now()
     start = today - timedelta(days=dias - 1)
     current = start.replace(day=1)
@@ -141,6 +150,7 @@ def seed_despesas_fixas(dias):
 # seed_compras_estoque
 # -------------------------------------------------------
 def seed_compras_estoque(dias, inadimplencia_rate=0.05):
+    """Gera compras e movimentações fictícias de estoque."""
     today = datetime.now()
     start = today - timedelta(days=dias - 1)
 
@@ -198,6 +208,7 @@ def seed_compras_estoque(dias, inadimplencia_rate=0.05):
 # seed_sales_last_n_days  ← parte mais pesada, usa batch
 # -------------------------------------------------------
 def seed_sales_last_n_days(num_sales=100, inadimplencia_rate=0.10):
+    """Simula um histórico de vendas para relatórios."""
     customers = Customer.query.all()
     products  = Product.query.all()
 
@@ -287,6 +298,7 @@ def seed_sales_last_n_days(num_sales=100, inadimplencia_rate=0.10):
 # seed_all
 # -------------------------------------------------------
 def seed_all(num_customers=150, num_sales=300, reset_db=False):
+    """Executa as etapas de geração de dados; confira a opção reset_db."""
     if reset_db:
         db.drop_all()
         db.create_all()

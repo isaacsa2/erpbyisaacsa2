@@ -10,6 +10,10 @@ Projeto de estudo de um **ERP (Enterprise Resource Planning)** para uma padaria 
 
 O código do laboratório tem comentários em português explicando as partes principais; os exercícios SQL também trazem notas sobre DDL, DML, filtros, tabelas e relacionamentos. Os comentários não mudam a execução: servem para entender como cada passo funciona.
 
+## Entenda o código do ERP principal
+
+Além do laboratório de exercícios, o ERP principal contém comentários para iniciantes em `app.py`, `erp.py`, `models.py`, `seed_data.py`, nas telas e no CSS. Veja o **[guia para ler o ERP](docs/COMO_LER_O_ERP.md)** para acompanhar uma venda do formulário HTML até o banco de dados.
+
 ## Funcionalidades para estudar
 
 - Cadastro de **clientes, fornecedores e produtos**, incluindo estoque;

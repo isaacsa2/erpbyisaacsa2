@@ -1,3 +1,7 @@
+"""Modelos do banco: cada classe db.Model corresponde a uma tabela SQL.
+Column define uma coluna; primary_key é o ID; ForeignKey relaciona tabelas.
+"""
+
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, date, timedelta
 from decimal import Decimal, ROUND_HALF_UP
@@ -7,6 +11,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from flask_login import UserMixin
 
+# SQLAlchemy transforma objetos Python em registros do banco relacional.
 db = SQLAlchemy()
 
 models_page = 15
@@ -14,6 +19,7 @@ models_page = 15
 _fixed_costs_added = False
 
 def add_monthly_fixed_costs():
+    """Procura despesas fixas do dia para registrar lançamentos no mês."""
     global _fixed_costs_added
     if _fixed_costs_added:
         return  # já rodou, ignora
@@ -42,11 +48,13 @@ def add_monthly_fixed_costs():
     _fixed_costs_added = True
 
 def fmt(v):
+    """Arredonda um valor para duas casas decimais."""
     if v is None:
         return 0.0
     return float(Decimal(v).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP))
 
 def calculate_abc_curve(top_per_category=3):
+    """Classifica produtos segundo a participação acumulada nas vendas."""
     data = (
         db.session.query(
             Product.id,
@@ -80,6 +88,7 @@ def calculate_abc_curve(top_per_category=3):
     return abc_list
 
 def check_customer_defaulters():
+    """Atualiza a situação de inadimplência conforme contas associadas."""
     today = date.today()
     defaulters = Customer.query.join(AccountReceivable).filter(
         AccountReceivable.status == 'Atrasado',
@@ -106,6 +115,7 @@ def check_customer_defaulters():
     db.session.commit()
 
 def update_overdue_status():
+    """Verifica contas pendentes que já ultrapassaram o vencimento."""
     today = date.today()
     
     overdue_receivables = AccountReceivable.query.filter(
@@ -130,6 +140,7 @@ def update_overdue_status():
     check_customer_defaulters()
 
 def get_cash_flow_summary(days=30):
+    """Agrupa entradas e saídas por dia para gerar os gráficos."""
     today = datetime.today().date()
     start_date = today - timedelta(days=days-1)
     entries = TreasuryEntry.query.filter(TreasuryEntry.date >= start_date).all()
@@ -150,7 +161,9 @@ def get_cash_flow_summary(days=30):
     
     return cash_flow
 
+# ATENÇÃO DIDÁTICA: esta segunda definição sobrescreve a função homônima anterior.
 def update_overdue_status():
+    """Verifica contas pendentes que já ultrapassaram o vencimento."""
     today = date.today()
     pending_ars = AccountReceivable.query.filter(AccountReceivable.status=="Pendente", AccountReceivable.due_date<today).all()
     pending_aps = AccountPayable.query.filter(AccountPayable.status=="Pendente", AccountPayable.due_date<today).all()
@@ -160,6 +173,7 @@ def update_overdue_status():
         ap.status = "Atrasado"
 
 def add_treasury_entry(entry_type, amount, description='', origin=None, origin_id=None):
+    """Prepara uma movimentação de caixa sem repetir uma origem identificada."""
     existing_entry = None
     if origin and origin_id:
         existing_entry = TreasuryEntry.query.filter_by(origin=origin, origin_id=origin_id).first()
@@ -178,6 +192,7 @@ def add_treasury_entry(entry_type, amount, description='', origin=None, origin_i
     return te
 
 def add_treasury_gen(entry_type, amount, description='', origin=None, origin_id=None, entry_date=None, commit=True):
+    """Prepara um lançamento e permite confirmar imediatamente no banco."""
 
 
     if entry_date is None:
@@ -206,6 +221,7 @@ def add_treasury_gen(entry_type, amount, description='', origin=None, origin_id=
 # ----------------------------
 
 class Customer(db.Model):
+    """Cliente, ligado a vendas e contas a receber."""
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(120), unique=True)
@@ -218,10 +234,12 @@ class Customer(db.Model):
     credit_used = db.Column(db.Numeric(10, 2), default=0)
     
     # Relacionamentos
+    # 1:N significa que um cliente pode ter várias vendas.
     sales = db.relationship('Sale', backref='customer', lazy=True)
     receivables = db.relationship('AccountReceivable', backref='customer', lazy=True)
 
 class Supplier(db.Model):
+    """Fornecedor, ligado a contas a pagar."""
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
     contact = db.Column(db.String(120))
@@ -231,6 +249,7 @@ class Supplier(db.Model):
     payables = db.relationship('AccountPayable', backref='supplier', lazy=True)
 
 class Product(db.Model):
+    """Produto com preço, custo e estoque."""
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
     price = db.Column(db.Float, nullable=False, default=0.0)
@@ -241,12 +260,15 @@ class Product(db.Model):
         
     @property
     def margin_percent(self):
+        """Calcula a porcentagem da margem de lucro sobre a venda."""
         if self.price > 0:
             return round((self.price - self.cost) / self.price * 100, 2)
         return 0
 
 class Sale(db.Model):
+    """Venda vinculada a um cliente e a vários itens."""
     id = db.Column(db.Integer, primary_key=True)
+    # ForeignKey liga uma venda ao identificador de um cliente.
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
     date = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(20), default='Pendente')
@@ -255,9 +277,11 @@ class Sale(db.Model):
 
     @property
     def total(self):
+        """Soma o subtotal de cada item vinculado à venda."""
         return sum(item.subtotal for item in self.items)
 
     def cancel(self):
+        """Devolve unidades ao estoque e cancela a venda."""
         if self.status == "Cancelado":
             return
         for item in self.items:
@@ -271,6 +295,7 @@ class Sale(db.Model):
         db.session.commit()
 
     def redo(self):
+        """Reativa a venda se houver estoque suficiente."""
         if self.status != "Cancelado":
             return
         if any(item.product.stock < item.quantity for item in self.items):
@@ -283,6 +308,7 @@ class Sale(db.Model):
         db.session.commit()
 
 class SaleItem(db.Model):
+    """Item que relaciona venda, produto, quantidade e subtotal."""
     id = db.Column(db.Integer, primary_key=True)
     sale_id = db.Column(db.Integer, db.ForeignKey('sale.id'), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
@@ -290,6 +316,7 @@ class SaleItem(db.Model):
     subtotal = db.Column(db.Float, nullable=False)
 
 class AccountReceivable(db.Model):
+    """Valor que o cliente ainda precisa pagar."""
     id = db.Column(db.Integer, primary_key=True)
     sale_id = db.Column(db.Integer, db.ForeignKey('sale.id'), nullable=True)
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
@@ -301,6 +328,7 @@ class AccountReceivable(db.Model):
     notes = db.Column(db.String(250))
 
 class AccountPayable(db.Model):
+    """Valor que a empresa precisa pagar ao fornecedor."""
     id = db.Column(db.Integer, primary_key=True)
     supplier_id = db.Column(db.Integer, db.ForeignKey('supplier.id'), nullable=False)
     description = db.Column(db.String(250))
@@ -312,6 +340,7 @@ class AccountPayable(db.Model):
     notes = db.Column(db.String(250))
 
 class TreasuryEntry(db.Model):
+    """Entrada ou saída de dinheiro registrada no caixa."""
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, default=datetime.utcnow)
     type = db.Column(db.String(10), nullable=False)  # Entrada ou Saida
@@ -322,6 +351,7 @@ class TreasuryEntry(db.Model):
 
     @staticmethod
     def global_balance():
+        """Soma todas as entradas e subtrai todas as saídas."""
         return db.session.query(
             func.sum(
                 case(
@@ -334,6 +364,7 @@ class TreasuryEntry(db.Model):
     @staticmethod
 
     def add_manual(entry_type, amount, description):
+        """Cria uma entrada ou saída manual do caixa."""
         te = TreasuryEntry(
             date=datetime.now(),
             type=entry_type,
@@ -346,6 +377,7 @@ class TreasuryEntry(db.Model):
         return te
     
     def add_fixedcosts(entry_type, amount, description):
+        """Grava no caixa uma despesa fixa."""
         te = TreasuryEntry(
             date=datetime.now(),
             type=entry_type,
@@ -358,6 +390,7 @@ class TreasuryEntry(db.Model):
         return te
     
 class FixedCost(db.Model):
+    """Despesa recorrente, como aluguel ou energia."""
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(250), nullable=False)
@@ -370,10 +403,12 @@ class FixedCost(db.Model):
 # ----------------------------
 
 class Role(db.Model):
+    """Perfil de permissão do usuário: Admin, Gerente ou Caixa."""
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True)  # Admin, Gerente, Caixa
 
 class User(db.Model, UserMixin):
+    """Usuário autenticado, com hash da senha e perfil de acesso."""
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True)
     password_hash = db.Column(db.String(255))
@@ -381,9 +416,11 @@ class User(db.Model, UserMixin):
     role = db.relationship('Role')
 
     def set_password(self, password):
+        """Transforma a senha em hash antes de armazenar."""
         self.password_hash = generate_password_hash(password)
     
     def check_password(self, password):
+        """Compara a senha enviada com o hash guardado."""
         return check_password_hash(self.password_hash, password)
 
 

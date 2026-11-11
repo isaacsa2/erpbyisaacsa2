@@ -1,3 +1,5 @@
+{# GUIA PARA ALUNOS: Layout principal compartilhado: menu, blocos das páginas e tema. #}
+{# No Jinja, for percorre listas; if escolhe trechos; extends usa o layout compartilhado. #}
 <!doctype html>
 <html lang="pt-br">
 <head>
@@ -97,7 +99,8 @@
             </li>
             <!-- Logout -->
             <li class="nav-item ms-auto">
-                <form method="POST" action="{{ url_for('erp.logout') }}"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><button type="submit" class="nav-link text-danger logout-btn" data-bs-toggle="tooltip" title="Sair do sistema">
+                {# POST envia os campos para uma rota Python validar e salvar. #}
+<form method="POST" action="{{ url_for('erp.logout') }}"><input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"><button type="submit" class="nav-link text-danger logout-btn" data-bs-toggle="tooltip" title="Sair do sistema">
                     <i class="bi bi-box-arrow-right"></i> <span class="nav-text">Logout</span>
                 </button></form>
             </li>
@@ -107,7 +110,8 @@
     <!-- Flash messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
-        {% for category, message in messages %}
+        {# for cria uma linha da lista para cada objeto enviado pelo servidor. #}
+{% for category, message in messages %}
           <div class="alert alert-{{ category }} alert-dismissible fade show mt-3" role="alert">
             {{ message }}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -130,6 +134,7 @@
 <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
 
 <script>
+// JavaScript da tela: recebe interações e atualiza elementos no navegador.
     // Tooltips
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {

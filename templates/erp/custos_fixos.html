@@ -1,10 +1,13 @@
+{# GUIA: Despesas que se repetem, como aluguel e internet. #}
+{# O Python entrega os registros; o Jinja monta a página com eles. #}
 {% extends "base.html" %}
 {% block content %}
 <div class="container mt-4">
     <h2>Custos Fixos</h2>
 
     <!-- Formulário -->
-    <form method="POST" class="row g-3 mb-4">
+    {# POST envia dados para uma rota de gravação. #}
+<form method="POST" class="row g-3 mb-4">
 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
         <div class="col-md-4">
             <input type="text" name="name" class="form-control" placeholder="Nome (ex: Aluguel)" required>
@@ -34,7 +37,8 @@
             </tr>
         </thead>
         <tbody>
-            {% for c in costs %}
+            {# A repetição abaixo mostra cada registro em uma linha ou cartão. #}
+{% for c in costs %}
             <tr>
                 <td>{{ c.name }}</td>
                 <td>R$ {{ c.amount | fmt }}</td>

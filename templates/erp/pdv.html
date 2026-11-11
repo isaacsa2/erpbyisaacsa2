@@ -1,3 +1,4 @@
+<!-- GUIA PARA ALUNOS: PDV: escolha de produto, quantidade, carrinho e finalização da venda. O HTML mostra a tela; o Python valida os dados. -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -16,7 +17,8 @@
                 <div class="p-3 h-100 d-flex flex-column">
                     <h4 class="text-gradient-pdv mb-4"><i class="bi bi-grid-fill me-2"></i>Produtos</h4>
                     
-                    <form method="POST" action="{{ url_for('erp.pdv_add_item') }}" class="mb-4">
+                    <!-- POST envia os campos para uma rota Python validar e salvar. -->
+<form method="POST" action="{{ url_for('erp.pdv_add_item') }}" class="mb-4">
 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                         <div class="mb-3">
                             <label class="form-label">Buscar Produto:</label>
@@ -30,7 +32,8 @@
                             <label class="form-label">Selecionar Produto:</label>
                             <select name="product_id" class="form-select select-enhanced" required>
                                 <option value="">-- Selecione um produto --</option>
-                                {% for product in products %}
+                                <!-- for cria elementos HTML para cada registro enviado pelo servidor. -->
+{% for product in products %}
                                     <option value="{{ product.id }}" data-price="{{ product.price }}" data-stock="{{ product.stock }}">
                                         {{ product.name }} - R$ {{ product.price|fmt }}
                                     </option>
@@ -236,6 +239,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+// JavaScript da tela: recebe interações e atualiza elementos no navegador.
     document.addEventListener('DOMContentLoaded', function() {
         // Busca rápida de produtos
         const productSearch = document.getElementById('productSearch');
