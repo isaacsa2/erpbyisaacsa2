@@ -1,4 +1,8 @@
--- DDL: Data Definition Language — criar tabelas e restrições
+-- GUIA: DDL cria a estrutura do banco (tabelas, colunas e restrições).
+-- CREATE TABLE cria uma tabela; PRIMARY KEY identifica uma linha.
+-- NOT NULL exige preenchimento; UNIQUE evita repetição;
+-- REFERENCES liga tabelas; CHECK valida uma condição.
+-- Execute somente em banco fictício e vazio. Este é o primeiro arquivo.
 PRAGMA foreign_keys = ON;
 CREATE TABLE cliente (
     id INTEGER PRIMARY KEY,

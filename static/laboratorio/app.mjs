@@ -1,3 +1,10 @@
+/**
+ * INTERFACE DO LABORATÓRIO
+ * Leia junto com index.html: o HTML tem os ids de cada formulário.
+ * Este arquivo escuta cliques, lê valores e mostra resultados.
+ * Os cálculos ficam separados em logica.mjs.
+ */
+// import permite usar funções definidas em logica.mjs.
 import {
   somar, idade, classificarTriangulo, tabuada, parcelas, totalCarrinho,
   trocoCentavos, imc, numero, resumoArray
@@ -5,16 +12,22 @@ import {
 
 const brl = cents => (cents / 100).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const decimal = value => Number(value).toLocaleString('pt-BR',{maximumFractionDigits:2});
+// $ é um atalho para encontrar um elemento com determinado id no HTML.
 const $ = id => document.getElementById(id);
 
+// Mostra um resultado ou um erro no elemento <output>.
+// try/catch impede que uma entrada inválida interrompa as demais atividades.
 function resultado(id, fn) {
   try { $(id).textContent = fn(); $(id).dataset.status = 'ok'; }
   catch (error) { $(id).textContent = error.message; $(id).dataset.status = 'erro'; }
 }
 
+// addEventListener executa uma função quando ocorre um evento (click/submit).
 function ligar(id, evento, callback) { $(id).addEventListener(evento,callback); }
 function textoValidado(id) { return $(id).value; }
 
+// SIGA O EXEMPLO: 1) localiza o formulário; 2) impede recarregamento;
+// 3) lê os campos; 4) chama somar(); 5) mostra a resposta.
 ligar('form-soma','submit', e => {
   e.preventDefault();
   resultado('resultado-soma',()=>`Resultado: ${decimal(somar(textoValidado('soma-a'),textoValidado('soma-b')))}`);
@@ -46,7 +59,8 @@ ligar('form-parcelas','submit',e=>{
   ).join('\n'));
 });
 
-// Exercício de arrays: os números ficam em estado temporário, sem banco.
+// Arrays: push adiciona, pop remove, sort organiza; tudo nesta aba.
+// Nenhum valor deste exercício é salvo no banco de dados do ERP.
 let valores = [12, 8, 25];
 function desenharArray() {
   $('array-valores').textContent = `[${valores.map(decimal).join(', ')}]`;
@@ -65,7 +79,8 @@ ligar('array-ordenar','click',()=>{valores.sort((a,b)=>a-b);desenharArray();$('a
 ligar('array-limpar','click',()=>{valores=[];desenharArray();$('aviso-array').textContent='Array zerado.';});
 desenharArray();
 
-// PDV de estudos. Cálculo em centavos e estoque simulado, não realiza venda real.
+// PDV DE ESTUDOS: produtos são objetos, carrinho é um array de objetos.
+// Os preços são centavos; estoque e vendas são fictícios e só existem na aba.
 const produtos = [
   {id:'pao',nome:'Pão',preco:100,estoque:12},
   {id:'suco',nome:'Suco',preco:850,estoque:8},
@@ -73,6 +88,7 @@ const produtos = [
   {id:'cafe',nome:'Café',preco:450,estoque:10},
 ];
 let carrinho = [];
+// "Desenhar" significa atualizar o HTML para refletir o carrinho atual.
 function desenharPDV() {
   const select = $('pdv-produto'), escolhido = select.value;
   select.replaceChildren();
@@ -122,7 +138,8 @@ ligar('pdv-resetar','click',()=>{
 });
 desenharPDV();
 
-// Tema 16: localStorage (persistência somente no navegador deste dispositivo).
+// Anotações: localStorage guarda texto neste navegador, não no servidor.
+// Nunca coloque senhas ou dados pessoais neste exercício.
 const CHAVE = 'erp-isaac-aula16-notas-v1';
 let notas = [];
 let permitePersistencia = true;
@@ -164,7 +181,7 @@ ligar('form-nota','submit',e=>{
 ligar('nota-cancelar','click',()=>{$('form-nota').reset();$('aviso-notas').textContent='Edição cancelada.';});
 desenharNotas();
 
-// Filtro de módulos para facilitar o estudo e o trabalho em sala.
+// Os botões data-filtro mostram/escondem cards por data-categoria.
 for(const botao of document.querySelectorAll('[data-filtro]')) {
   botao.addEventListener('click',()=>{
     const filtro=botao.dataset.filtro;
