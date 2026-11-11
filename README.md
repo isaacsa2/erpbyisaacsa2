@@ -14,6 +14,10 @@ O código do laboratório tem comentários em português explicando as partes pr
 
 Além do laboratório de exercícios, o ERP principal contém comentários para iniciantes em `app.py`, `erp.py`, `models.py`, `seed_data.py`, nas telas e no CSS. Veja o **[guia para ler o ERP](docs/COMO_LER_O_ERP.md)** para acompanhar uma venda do formulário HTML até o banco de dados.
 
+## Modo Aprendiz: código REAL na própria tela
+
+Após o login, clique no botão **Modo Aprendiz** para ver as funções Python, templates HTML/Jinja, classes SQLAlchemy e CSS da versão em execução. Cada trecho aponta para seu arquivo e linha no GitHub; não são snippets inventados. Veja [o guia](docs/MODO_APRENDIZ.md).
+
 ## Demonstração na Render (somente leitura)
 
 O arquivo [render.yaml](render.yaml) configura uma demo do ERP na Render, usando dados simulados. Para a turma visualizar: **usuário `admin` / senha `admin`**, sem acesso à escrita (não é uma conta administrativa real). Veja [como publicar na Render](docs/DEPLOY_RENDER.md). A instância Free perde o banco SQLite quando reinicia: não use para armazenar trabalhos.
