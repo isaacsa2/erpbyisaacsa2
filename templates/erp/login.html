@@ -8,6 +8,13 @@
 <div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
     <div class="card p-4 shadow" style="width: 100%; max-width: 400px;">
         <h3 class="text-center mb-3">Login ERP</h3>
+        {% if config.get('DEMO_MODE') %}
+        <div class="alert alert-info" role="note">
+          <strong>ERP para a faculdade (somente leitura).</strong>
+          Usuário <code>admin</code> e senha <code>admin</code>.
+          Todos os dados desta demonstração são fictícios. O modo aprendiz e os exercícios ajudam a estudar o código.
+        </div>
+        {% endif %}
 
         {# Este formulário envia informações ao Flask. Mantenha o token CSRF existente. #}
 <form method="POST" action="{{ url_for('erp.login') }}">

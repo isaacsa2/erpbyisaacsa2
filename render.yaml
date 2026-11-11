@@ -1,0 +1,16 @@
+# Demonstração didática; NÃO usar com dados verdadeiros.
+services:
+  - type: web
+    name: erp-by-isaac-demo
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 4 app:app
+    healthCheckPath: /healthz
+    envVars:
+      - key: ERP_DEMO_MODE
+        value: "1"
+      - key: ERP_COOKIE_SECURE
+        value: "1"
+      - key: ERP_SECRET_KEY
+        generateValue: true
