@@ -50,6 +50,16 @@ def real_text(filename):
     return {"arquivo": filename, "inicio": 1, "fim": len(lines),
             "codigo": "\n".join(f"{i:>4} | {line}" for i,line in enumerate(lines,1))}
 
+# Outras ações reais ligadas à tela. Ex.: a rota GET do PDV só desenha a página;
+# quem altera estoque são as funções POST listadas abaixo.
+ACTION_FUNCS = {
+    "erp.pdv": ["pdv_add_item", "pdv_finish", "pdv_cancel", "pdv_remove_item", "pdv_change_customer"],
+    "erp.sales": ["cancel_sale", "undo_cancel_sale"],
+    "erp.receivables": ["receivables_pay"],
+    "erp.payables": ["payables_pay"],
+    "erp.defaulters_report": ["mark_as_defaulter", "regularize_customer"],
+}
+
 @learn_bp.get("/aprendiz/api")
 @login_required
 def api():
@@ -63,6 +73,7 @@ def api():
         sections = [
             {"titulo": "Python — rota real", "linguagem": "python", **real_python("erp.py",function_name)},
             {"titulo": "HTML/Jinja — arquivo real", "linguagem": "html", **real_text("templates/"+html)},
+            *[{"titulo": "Ação de negócio — "+name, "linguagem": "python", **real_python("erp.py",name)} for name in ACTION_FUNCS.get(page,[])],
             *[{"titulo": "Modelo — "+name, "linguagem": "python", **real_python("models.py",name,"class")} for name in models],
             {"titulo": "CSS — arquivo real", "linguagem": "css", **real_text("static/erp_style.css")},
         ]
