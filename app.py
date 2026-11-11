@@ -1,3 +1,7 @@
+"""Ponto de entrada do ERP: configura Flask, banco de dados e autenticação.
+O navegador acessa uma rota em erp.py, que utiliza as tabelas de models.py.
+"""
+
 import os
 import secrets
 import click
@@ -8,6 +12,7 @@ from flask_migrate import Migrate
 from erp import erp_bp
 from models import db, User, Role, fmt
 
+# Flask recebe as requisições HTTP e escolhe qual função responderá a cada URL.
 app = Flask(__name__)
 app.config.update(
     SQLALCHEMY_DATABASE_URI=os.environ.get("DATABASE_URL", "sqlite:///erp_estudos.db"),
@@ -17,6 +22,7 @@ app.config.update(
     SESSION_COOKIE_SAMESITE="Lax",
     SESSION_COOKIE_SECURE=os.environ.get("ERP_COOKIE_SECURE") == "1",
 )
+# SQLAlchemy faz a ponte entre os objetos Python e o banco configurado.
 db.init_app(app)
 migrate = Migrate(app, db)
 login_manager = LoginManager()
@@ -25,14 +31,18 @@ login_manager.init_app(app)
 
 @login_manager.user_loader
 def load_user(user_id):
+    """Recupera o usuário autenticado pelo ID guardado na sessão."""
     try:
         return db.session.get(User, int(user_id))
     except (ValueError, TypeError):
         return None
 
+# As rotas (URLs) do ERP ficam organizadas no arquivo erp.py.
 app.register_blueprint(erp_bp)
 
+# O token CSRF impede que um terceiro envie um formulário em nome do usuário.
 def csrf_token():
+    """Cria um token de sessão para proteger o envio dos formulários."""
     token = session.get("_csrf_token")
     if token is None:
         token = secrets.token_urlsafe(32)
@@ -41,6 +51,7 @@ def csrf_token():
 
 @app.before_request
 def enforce_csrf():
+    """Confere o token antes de aceitar uma alteração enviada pelo navegador."""
     if request.method in {"POST", "PUT", "PATCH", "DELETE"}:
         expected = session.get("_csrf_token")
         provided = request.form.get("_csrf_token") or request.headers.get("X-CSRF-Token")
@@ -49,15 +60,18 @@ def enforce_csrf():
 
 @app.context_processor
 def inject_globals():
+    """Disponibiliza valores e funções para todas as páginas HTML."""
     return {"now": datetime.now(), "date": date, "csrf_token": csrf_token, "fmt": fmt}
 
 @app.template_filter("fmt")
 def jinja_fmt(v):
+    """Converte números em texto com vírgula decimal."""
     if v is None: return "0,00"
     return f"{fmt(v):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
 @app.template_filter("datetime_fmt")
 def datetime_fmt(value, fmt="%d/%m/%Y %H:%M"):
+    """Transforma data e hora em texto legível para a página."""
     if not value: return "Não pago ainda"
     if isinstance(value, date) and not isinstance(value, datetime):
         value = datetime.combine(value, datetime.min.time())
@@ -65,6 +79,7 @@ def datetime_fmt(value, fmt="%d/%m/%Y %H:%M"):
 
 @app.template_filter("date_fmt")
 def date_fmt(value, fmt="%d/%m/%Y"):
+    """Transforma uma data em texto no formato brasileiro."""
     return value.strftime(fmt) if value else "-"
 
 @app.errorhandler(400)
