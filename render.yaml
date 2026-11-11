@@ -1,4 +1,4 @@
-# Demonstração didática; NÃO usar com dados verdadeiros.
+# Demonstração didática editável: só dados fictícios, SQLite isolado e recriado a cada boot.
 services:
   - type: web
     name: erp-by-isaac-demo
@@ -10,6 +10,10 @@ services:
     envVars:
       - key: ERP_DEMO_MODE
         value: "1"
+      - key: WEB_CONCURRENCY
+        value: "1"
+      - key: ERP_DEMO_PASSWORD
+        value: "admin"
       - key: ERP_COOKIE_SECURE
         value: "1"
       - key: ERP_SECRET_KEY

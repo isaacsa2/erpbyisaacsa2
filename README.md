@@ -18,9 +18,11 @@ Além do laboratório de exercícios, o ERP principal contém comentários para 
 
 Após o login, clique no botão **Modo Aprendiz** para ver as funções Python, templates HTML/Jinja, classes SQLAlchemy e CSS da versão em execução. Cada trecho aponta para seu arquivo e linha no GitHub; não são snippets inventados. Veja [o guia](docs/MODO_APRENDIZ.md).
 
-## Demonstração na Render (somente leitura)
+## Demonstração na Render (Admin completo, banco temporário)
 
-O arquivo [render.yaml](render.yaml) configura uma demo do ERP na Render, usando dados simulados. Para a turma visualizar: **usuário `admin` / senha `admin`**, sem acesso à escrita (não é uma conta administrativa real). Veja [como publicar na Render](docs/DEPLOY_RENDER.md). A instância Free perde o banco SQLite quando reinicia: não use para armazenar trabalhos.
+A turma pode abrir **https://erpbyisaacsa2.onrender.com**, entrar com **usuário `admin` / senha `admin`** e testar todas as operações do ERP (cadastro, edição, vendas e exclusões) como **Admin**.
+
+**Somente para estudos:** este acesso é público e compartilhado. Não cadastre dados pessoais ou informações reais. No modo `ERP_DEMO_MODE=1`, a aplicação **ignora `DATABASE_URL`**, utiliza um SQLite próprio em `instance/erp_demo_faculdade.sqlite3` e **apaga e recria as tabelas e os exemplos a cada início do processo** (inclusive reinicializações e deploys). O acesso local padrão, sem demo, não muda. Veja [o guia da Render](docs/DEPLOY_RENDER.md).
 
 ## Funcionalidades para estudar
 
