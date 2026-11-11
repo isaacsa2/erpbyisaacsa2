@@ -22,7 +22,8 @@ app.config.update(
     SQLALCHEMY_DATABASE_URI=os.environ.get("DATABASE_URL", "sqlite:///erp_estudos.db"),
     SQLALCHEMY_TRACK_MODIFICATIONS=False,
     SECRET_KEY=os.environ.get("ERP_SECRET_KEY") or secrets.token_hex(32),
-    DEMO_MODE=DEMO_MODE,\n    SESSION_COOKIE_HTTPONLY=True,
+    DEMO_MODE=DEMO_MODE,
+    SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE="Lax",
     SESSION_COOKIE_SECURE=os.environ.get("ERP_COOKIE_SECURE") == "1",
 )
