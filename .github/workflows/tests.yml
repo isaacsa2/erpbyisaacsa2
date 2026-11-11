@@ -20,3 +20,15 @@ jobs:
         run: python -m compileall -q app.py erp.py models.py seed_data.py exemplos tests
       - name: Examples and ERP integration
         run: python -m unittest discover -s tests -v
+
+  javascript_lab:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: JavaScript syntax and exercises
+        run: |
+          node --check static/laboratorio/app.mjs
+          node --test static/laboratorio/testes.mjs

@@ -3,6 +3,7 @@
 {% block content %}
 <main class="container py-4">
   <h1 class="fw-bold">Laboratório SQL</h1>
+  <div class="alert alert-success"><strong>Novidade das aulas:</strong> <a class="alert-link" href="{{ url_for('static', filename='laboratorio/index.html') }}">Abrir laboratório interativo</a> — JavaScript, loops, decisões, PDV online e anotações (funciona offline).</div>
   <p class="lead">Estude consultas reais das disciplinas de Banco de Dados, com resultados atuais do ERP.</p>
   <div class="alert alert-info">As consultas aqui são <strong>somente leitura</strong> e pré-definidas. Para praticar INSERT, UPDATE e DELETE sem riscos, execute <code>python exemplos/executar.py</code> no terminal.</div>
   {% for item in outputs %}
