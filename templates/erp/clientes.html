@@ -1,3 +1,5 @@
+{# GUIA: Cadastro e pesquisa de clientes, com tabela paginada. #}
+{# As variáveis exibidas na tela chegam do Python pela função render_template. #}
 {% extends "base.html" %}
 {% block title %}Clientes{% endblock %}
 
@@ -5,6 +7,7 @@
 <h2 class="mb-4">Clientes</h2>
 
 <!-- Busca -->
+{# GET envia filtros de pesquisa pela URL. #}
 <form method="GET" class="mb-3 d-flex">
     <input type="text" name="q" class="form-control me-2" placeholder="Buscar cliente..." value="{{ q }}">
     <button class="btn btn-outline-primary">Buscar</button>
@@ -40,7 +43,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for c in customers %}
+                    {# Este laço cria uma linha para cada registro recebido do banco. #}
+{% for c in customers %}
                     <tr class="align-middle">
                         <td>{{ c.name }}</td>
                         <td>{{ c.email }}</td>
