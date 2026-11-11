@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Laboratório offline de Algoritmos, JavaScript e modelagem de dados. Exercícios baseados nas aulas da UNEX com exemplos originais e testes.">
+  <title>Laboratório da Faculdade • ERP by Isaac</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="container">
+    <a class="brand" href="../../">ERP <span>by Isaac</span> / Lab</a>
+    <nav aria-label="Navegação"><a href="#atividades">Atividades</a><a href="#banco">Banco de dados</a><a href="../../">Voltar ao ERP</a></nav>
+  </header>
+  <main class="container">
+    <section class="hero" aria-labelledby="titulo">
+      <div>
+        <div class="eyebrow">Laboratório interativo • faculdade</div>
+        <h1 id="titulo">Aprender programação <strong>fazendo.</strong></h1>
+        <p class="lead">Exercícios executáveis de algoritmos, HTML, CSS e JavaScript, construídos a partir dos temas dos materiais de aula. Use o navegador, altere os códigos e observe a saída. <b>Funciona offline</b>, sem login, sem mandar dados ao servidor.</p>
+        <p><a href="./logica.mjs">Ver as funções JavaScript</a> · <a href="https://github.com/isaacsa2/erpbyisaacsa2/blob/main/docs/MAPA_DAS_AULAS.md">Roteiro das 23 aulas (no repositório)</a></p>
+      </div>
+      <aside class="summary" aria-label="Resumo do laboratório">
+        <strong>9</strong><p>exercícios interativos</p>
+        <strong>2</strong><p>áreas de estudo: algoritmos e banco de dados</p>
+        <strong>100%</strong><p>dados fictícios e simulações locais</p>
+      </aside>
+    </section>
+
+    <section id="atividades" aria-labelledby="titulo-atividades">
+      <h2 id="titulo-atividades">Escolha um assunto</h2>
+      <div class="pills" role="group" aria-label="Filtrar exercícios">
+        <button type="button" data-filtro="todos" aria-pressed="true">Todos</button>
+        <button type="button" data-filtro="inicio" aria-pressed="false">Fundamentos</button>
+        <button type="button" data-filtro="decisao" aria-pressed="false">Decisão</button>
+        <button type="button" data-filtro="repeticao" aria-pressed="false">Repetição / Arrays</button>
+        <button type="button" data-filtro="projeto" aria-pressed="false">Projetos reais</button>
+      </div>
+      <div class="grid">
+        <article class="card" data-categoria="inicio">
+          <div class="module-tag">Temas 1, 2, 5 e 7 · Entradas, variáveis e soma</div>
+          <h2>Calculadora de soma</h2>
+          <p>Aprenda entrada → processamento → saída. O JavaScript lê dois números, calcula e atualiza o DOM.</p>
+          <form id="form-soma">
+            <label>Primeiro número<input type="number" id="soma-a" step="any" value="2" required></label>
+            <label>Segundo número<input type="number" id="soma-b" step="any" value="3" required></label>
+            <button class="btn" type="submit">Somar</button>
+          </form>
+          <output class="output" id="resultado-soma" aria-live="polite">Altere os números e clique em Somar.</output>
+          <details><summary>Veja a lógica</summary><pre>const n1 = Number(campoA.value);
+const n2 = Number(campoB.value);
+resultado.textContent = n1 + n2;</pre></details>
+        </article>
+
+        <article class="card" data-categoria="inicio">
+          <div class="module-tag">Tema 8 · Datas, funções e DOM</div>
+          <h2>Calculadora de idade</h2>
+          <p>Calcula anos completos, considerando se a pessoa já fez aniversário no ano corrente.</p>
+          <form id="form-idade">
+            <label>Data de nascimento<input type="date" id="nascimento" value="2000-01-15" required></label>
+            <button class="btn" type="submit">Calcular idade</button>
+          </form>
+          <output class="output" id="resultado-idade" aria-live="polite">Qual é a idade correta hoje?</output>
+          <details><summary>O desafio</summary><pre>anos = anoAtual - anoNascimento;
+se o aniversário ainda não chegou:
+    anos = anos - 1;</pre></details>
+        </article>
+
+        <article class="card" data-categoria="decisao">
+          <div class="module-tag">Temas 9 e 10 · if / else / &amp;&amp;</div>
+          <h2>Classificador de triângulos</h2>
+          <p>Primeiro confira a desigualdade triangular. Depois classifique: equilátero, isósceles ou escaleno.</p>
+          <form id="form-triangulo">
+            <label>Lado A<input type="number" id="lado-a" min="0.01" step="any" value="3" required></label>
+            <label>Lado B<input type="number" id="lado-b" min="0.01" step="any" value="4" required></label>
+            <label>Lado C<input type="number" id="lado-c" min="0.01" step="any" value="5" required></label>
+            <button class="btn" type="submit">Classificar</button>
+          </form>
+          <output class="output" id="resultado-triangulo" aria-live="polite">Um triângulo com lados 3, 4 e 5 é escaleno.</output>
+          <details><summary>Condição importante</summary><pre>if (a + b &lt;= c || a + c &lt;= b || b + c &lt;= a) {
+  // Não forma triângulo!
+}</pre></details>
+        </article>
+
+        <article class="card" data-categoria="decisao">
+          <div class="module-tag">Tema 9 · Condições encadeadas</div>
+          <h2>Classificação de IMC (didática)</h2>
+          <p>Exercício das condições <code>if/else</code> com os intervalos apresentados na aula. Não é ferramenta de diagnóstico.</p>
+          <form id="form-imc">
+            <label>Peso (kg)<input type="number" id="peso" min="1" step="any" value="70" required></label>
+            <label>Altura (m)<input type="number" id="altura" min="0.1" max="3" step="any" value="1.75" required></label>
+            <button class="btn" type="submit">Classificar</button>
+          </form>
+          <output class="output" id="resultado-imc" aria-live="polite">Informe peso e altura.</output>
+        </article>
+
+        <article class="card" data-categoria="repeticao">
+          <div class="module-tag">Temas 11 e 12 · for / while / DOM</div>
+          <h2>Tabuada dinâmica</h2>
+          <p>Em vez de escrever 10 contas à mão, um laço constrói as linhas da tabuada.</p>
+          <form id="form-tabuada">
+            <label>Número inteiro<input type="number" id="tabuada-numero" step="1" value="5" required></label>
+            <button class="btn" type="submit">Gerar tabuada</button>
+          </form>
+          <output class="output" id="resultado-tabuada" aria-live="polite">Escolha um número e gere a tabuada.</output>
+          <details><summary>Veja um for simples</summary><pre>for (let i = 1; i &lt;= 10; i++) {
+  console.log(numero * i);
+}</pre></details>
+        </article>
+
+        <article class="card" data-categoria="repeticao">
+          <div class="module-tag">Tema 11 · Repetição + switch</div>
+          <h2>Simulador de parcelamento</h2>
+          <p>Planos de 3, 6, 9 e 12 parcelas com taxas didáticas fixas de 10%, 15%, 20% e 25%. Centavos distribuídos sem perdas.</p>
+          <form id="form-parcelas">
+            <label>Valor original em R$<input type="number" id="principal" min="0.01" step="0.01" value="1000" required></label>
+            <button class="btn" type="submit">Simular planos</button>
+          </form>
+          <output class="output" id="resultado-parcelas" aria-live="polite">Exemplo: R$ 1.000,00.</output>
+          <small class="helper">Juros fixos de exercício, não condições reais de crédito; não confundir com juros compostos.</small>
+        </article>
+
+        <article class="card" data-categoria="repeticao">
+          <div class="module-tag">Temas 13 e 14 · Arrays e funções</div>
+          <h2>Laboratório de arrays</h2>
+          <p>Experimente <code>push()</code>, <code>pop()</code>, <code>sort()</code>, média, máximo e mínimo. O array muda na tela.</p>
+          <p><strong id="array-valores">[12, 8, 25]</strong></p>
+          <form id="form-array">
+            <label>Novo valor<input type="number" id="array-valor" step="any" value="10" required></label>
+            <button class="btn" type="submit">Adicionar</button>
+          </form>
+          <div class="actions">
+            <button class="btn btn-secondary" type="button" id="array-remover">Remover último</button>
+            <button class="btn btn-secondary" type="button" id="array-ordenar">Ordenar</button>
+            <button class="btn btn-secondary" type="button" id="array-limpar">Limpar</button>
+          </div>
+          <output class="output" id="resultado-array" aria-live="polite"></output>
+          <output class="helper" id="aviso-array" aria-live="polite"></output>
+        </article>
+
+        <article class="card" data-categoria="projeto">
+          <div class="module-tag">Tema 15 · Arrays, funções, eventos e PDV</div>
+          <h2>PDV online simulado</h2>
+          <p>Escolha produtos, valide estoque, monte o carrinho, calcule o total e o troco. Tudo no navegador, sem vendas reais.</p>
+          <form id="form-pdv">
+            <label>Produto<select id="pdv-produto"></select></label>
+            <label>Quantidade<input type="number" id="pdv-quantidade" min="1" step="1" value="1" required></label>
+            <button class="btn" type="submit">Adicionar item</button>
+          </form>
+          <ul id="pdv-lista" aria-label="Itens do carrinho"></ul>
+          <p><b>Total: <span class="highlight" id="pdv-total">R$ 0,00</span></b></p>
+          <label>Pagamento recebido em R$<input type="number" id="pdv-pago" min="0" step="0.01" value="30" aria-label="Valor pago"></label>
+          <div class="actions"><button class="btn" type="button" id="pdv-finalizar">Finalizar venda simulada</button><button class="btn btn-secondary" type="button" id="pdv-resetar">Reiniciar exercício</button></div>
+          <output class="output" id="resultado-pdv" aria-live="polite">O estoque deste PDV é somente fictício.</output>
+        </article>
+
+        <article class="card" data-categoria="projeto">
+          <div class="module-tag">Tema 16 · DOM e localStorage</div>
+          <h2>App de anotações</h2>
+          <p>Crie, edite e exclua notas. O navegador guarda os textos localmente, se o armazenamento estiver disponível.</p>
+          <form id="form-nota">
+            <label>Anotação<textarea id="nota-texto" maxlength="500" placeholder="Escreva um resumo ou exercício..." required></textarea></label>
+            <input id="nota-id" type="hidden" value="">
+            <button class="btn" type="submit">Salvar</button>
+            <button class="btn btn-secondary" type="button" id="nota-cancelar">Cancelar edição</button>
+          </form>
+          <ul id="lista-notas"></ul>
+          <output class="output" id="aviso-notas" aria-live="polite">Não coloque senhas ou dados pessoais nas notas.</output>
+        </article>
+      </div>
+    </section>
+
+    <section id="banco" class="path" aria-labelledby="banco-titulo">
+      <div class="eyebrow">Sistemas de Informação · Modelagem relacional</div>
+      <h2 id="banco-titulo">Aula prática do professor Ramon Paixão: sistema de vendas</h2>
+      <p>Na atividade do modelo relacional, aparecem <strong>clientes, vendedores, vendas, produtos e prateleiras</strong>. O exercício SQL deste repositório implementa as entidades com chaves primárias e estrangeiras, relação N:N entre venda e produto resolvida por <code>item_venda</code> e consultas reais.</p>
+      <p>Execute no terminal: <code>python exemplos/modelagem_vendas.py</code>. O banco fica somente na memória; não toca no ERP.</p>
+      <p><a href="https://github.com/isaacsa2/erpbyisaacsa2/blob/main/exemplos/04_modelagem_vendas.sql">Ver o SQL do exercício (no repositório)</a> · <a href="https://github.com/isaacsa2/erpbyisaacsa2/blob/main/docs/MAPA_DAS_AULAS.md">Ver origem de cada atividade</a></p>
+    </section>
+  </main>
+  <footer class="container">ERP by Isaac · Material independente de apoio ao estudo. Exercícios adaptados dos temas das aulas, sem redistribuir os PDFs dos professores. Não usar em produção.</footer>
+  <script type="module" src="./app.mjs"></script>
+</body>
+</html>

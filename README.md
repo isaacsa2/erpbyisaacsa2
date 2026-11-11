@@ -27,6 +27,17 @@ python -m unittest discover -s tests -v
 
 Os exemplos estão explicados em [`docs/EXEMPLOS.md`](docs/EXEMPLOS.md) e [`docs/KANBAN.md`](docs/KANBAN.md). Há também uma aba **Laboratório SQL** dentro do ERP, que mostra o resultado de consultas de leitura.
 
+## Novidade: Laboratório das aulas (23 PDFs mapeados)
+
+O pacote de aulas da faculdade foi revisado por assunto: 16 PDFs de Algoritmos/Web/JavaScript e 7 de Banco de Dados/Modelagem. Os exemplos originais foram **adaptados para exercícios novos e testáveis**, sem redistribuir os PDFs.
+
+- **Laboratório interativo de JavaScript:** nove exercícios (soma, idade, triângulos, IMC didático, tabuada, parcelamento, arrays, PDV e notas com `localStorage`). Abra `http://127.0.0.1:5000/static/laboratorio/` depois de iniciar o Flask, ou use `python -m http.server 8000` para abrir `http://127.0.0.1:8000/static/laboratorio/`, sem instalar o ERP.
+- **Modelagem de vendas:** exercício inspirado no sistema com clientes, vendedores, prateleiras, produtos e vendas, com chaves e integridade referencial em SQLite isolado: `python exemplos/modelagem_vendas.py`.
+- **Mapa dos PDFs, atividades e DER:** [docs/MAPA_DAS_AULAS.md](docs/MAPA_DAS_AULAS.md).
+- **Testes do JavaScript:** `node --test static/laboratorio/testes.mjs` (Node.js 20+).
+
+Os exercícios didáticos não acessam o banco principal e o PDV web não gera vendas reais.
+
 ## Como executar (Windows, Linux e macOS)
 
 É necessário **Python 3.11 ou superior** e Git (para clonar). No terminal, execute:

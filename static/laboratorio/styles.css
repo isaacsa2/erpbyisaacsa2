@@ -1,0 +1,51 @@
+:root {font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#eaf1f9;background:#0d131b;color-scheme:dark;font-size:16px}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;line-height:1.55;background:radial-gradient(circle at 15% 0,#1a3342 0,transparent 40%),#0d131b}
+a{color:#9ee5ec}
+a:hover{text-decoration:underline}
+.container{max-width:1190px;margin:auto;padding:20px clamp(15px,3vw,28px)}
+header{display:flex;justify-content:space-between;align-items:center;gap:20px;padding-top:24px;padding-bottom:12px;flex-wrap:wrap}
+.brand{font-size:1.1rem;font-weight:800;letter-spacing:.4px;color:#fff;text-decoration:none}
+.brand span{color:#ff9e59}
+header nav{display:flex;gap:18px;flex-wrap:wrap}
+.hero{padding:54px 0 30px;display:grid;grid-template-columns:1.35fr .65fr;align-items:center;gap:36px}
+.eyebrow{text-transform:uppercase;letter-spacing:1.6px;color:#ffad72;font-weight:750;font-size:.75rem}
+h1{font-size:clamp(2.1rem,5.2vw,4rem);line-height:1.1;letter-spacing:-1px;margin:14px 0 18px}
+h1 strong{color:#ff9954}
+h2{font-size:1.2rem;line-height:1.25;margin:.3rem 0 .7rem}
+h3{font-size:1rem;margin:.8rem 0 .3rem}
+.lead{color:#afc2d2;font-size:1.05rem;max-width:690px}
+.summary{padding:22px;border-radius:18px;background:linear-gradient(130deg,#203140,#16212c);border:1px solid #385060;box-shadow:0 15px 55px #0710188c}
+.summary strong{display:block;font-size:2.5rem;color:#ffad74;line-height:1.2}
+.summary p{margin:3px 0 15px;color:#c2d0da}.summary p:last-child{margin:0}
+.highlight{color:#ffb380}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 28px}
+.pills button{color:#dce6ed;border:1px solid #344a5a;background:#1b2a37;padding:9px 14px;border-radius:999px;cursor:pointer}
+.pills button[aria-pressed="true"]{background:#e57933;color:#151616;border-color:#e57933;font-weight:800}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.card{background:#182430;border:1px solid #33495a;padding:22px;border-radius:16px;min-width:0;box-shadow:0 8px 23px #0710183d}
+.card[hidden]{display:none}
+.module-tag{color:#ffba8e;font-size:.77rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:9px}
+.card p{color:#bdcbd7;margin-top:0}
+.card form{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+.card label{display:flex;flex-direction:column;gap:4px;color:#e9f0f5;font-weight:600;font-size:.85rem;flex:1 1 110px}
+input,select,textarea{border-radius:9px;border:1px solid #5b6d7b;background:#101b25;color:#fff;padding:10px 11px;font:inherit;min-width:0;width:100%}
+textarea{resize:vertical;min-height:80px}
+input:focus,select:focus,textarea:focus{outline:2px solid #ffae7d;outline-offset:2px}
+.btn{border:0;background:#f08b49;color:#11171b;padding:10px 14px;border-radius:9px;font-weight:800;cursor:pointer;font:inherit;white-space:nowrap}
+.btn:hover{background:#ffaf73}.btn-secondary{background:#294355;color:#e4f3ff}.btn-secondary:hover{background:#35556b}.btn-mini{font-size:.8rem;padding:6px 9px;background:#294355;color:#e4f3ff}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.output{border:1px solid #345363;background:#0e1b25;color:#bfead7;padding:12px 13px;border-radius:10px;min-height:48px;white-space:pre-wrap;overflow-wrap:anywhere;margin:13px 0 4px;font-size:.95rem}
+.output[data-status="erro"]{color:#ffd6c2;border-color:#c66b57;background:#351f20}
+small,.helper{color:#afc2d0}.helper{display:block;font-size:.83rem;margin-top:8px}
+pre{background:#0b161f;padding:12px;border-radius:8px;overflow-x:auto;font-size:.83rem;white-space:pre-wrap;overflow-wrap:anywhere;border:1px solid #324655}
+details{margin-top:15px;color:#d9e6f1;border-top:1px solid #314657;padding-top:10px}
+summary{cursor:pointer;font-weight:700;color:#b8dbe9}
+.item-carrinho,.nota{display:flex;gap:9px;align-items:center;justify-content:space-between;margin:8px 0;padding:8px 0;border-bottom:1px solid #304454}
+ul{padding-left:23px}.item-carrinho span,.nota span{overflow-wrap:anywhere;min-width:0}
+.nota-botoes{display:flex;gap:5px;flex-shrink:0}
+.path{background:#192d3a;border:1px solid #3d5769;border-radius:13px;padding:20px;margin:30px 0 14px}
+.path p{margin:.3rem 0 0;color:#bfcedb}
+footer{border-top:1px solid #2e3f50;margin-top:40px;padding-top:22px;padding-bottom:44px;color:#b0c2cd}
+@media(max-width:810px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:1fr}h1{letter-spacing:-.4px}}
+@media(max-width:430px){.card{padding:15px}.pills button{flex:1}.summary{padding:17px}}
